@@ -214,7 +214,7 @@ const Experience = ({ language }) => {
             <h2 className="text-4xl md:text-6xl font-black text-white tracking-tighter leading-none">
               {title}
             </h2>
-            <div className="w-24 h-2 bg-gradient-to-r from-neon-cyan to-neon-purple mt-6 rounded-full mx-auto lg:mx-0 shadow-[0_0_15px_rgba(34,211,238,0.5)]"></div>
+            <div className="w-24 h-2 bg-gradient-to-r from-electric-violet to-neon-cyan mt-6 rounded-full mx-auto lg:mx-0 shadow-[0_0_15px_rgba(124,58,237,0.5)]"></div>
           </motion.div>
 
           <div className="relative w-full bg-black/40 backdrop-blur-md bg-black/60 border border-white/10 rounded-[2rem] overflow-hidden min-h-[520px] shadow-[0_20px_50px_rgba(0,0,0,0.4)]">

@@ -64,8 +64,8 @@ const Navbar = ({ language, toggleLanguage }) => {
   return (
     <>
       <motion.div
-        className="fixed top-0 left-0 right-0 h-[2px] bg-neon-cyan z-[101] origin-left"
-        style={{ scaleX }}
+        className="fixed top-0 left-0 right-0 h-[2px] z-[101] origin-left"
+        style={{ scaleX, background: 'linear-gradient(90deg, #7C3AED, #22D3EE)' }}
       />
 
       <header className="fixed top-0 left-0 right-0 z-50 flex justify-center p-4 md:p-6 pointer-events-none">
@@ -86,7 +86,7 @@ const Navbar = ({ language, toggleLanguage }) => {
             onClick={(e) => handleScrollTo(e, "#home")}
             className="text-xl font-black text-white tracking-tighter hover:opacity-80 transition-opacity"
           >
-            LF<span className="text-neon-cyan animate-pulse">.</span>
+            LF<span className="text-electric-violet">.</span>
           </a>
 
           <div className="hidden md:flex gap-8">
@@ -106,10 +106,10 @@ const Navbar = ({ language, toggleLanguage }) => {
           <a
             href="/curriculo.pdf"
             download="LuizFernando_BatistaMoreira_Currículo.pdf"
-            className="flex items-center gap-2 border border-white/10 bg-white/5 backdrop-blur-md px-3 sm:px-4 py-1.5 rounded-full hover:bg-neon-cyan hover:border-neon-cyan hover:text-black transition-all duration-300 group"
+            className="flex items-center gap-2 border border-white/10 bg-white/5 backdrop-blur-md px-3 sm:px-4 py-1.5 rounded-full hover:bg-electric-violet hover:border-electric-violet hover:text-white transition-all duration-300 group"
           >
             <FaFileDownload
-              className="text-neon-cyan group-hover:text-black transition-colors"
+              className="text-electric-violet group-hover:text-white transition-colors"
               size={14}
             />
             <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-slate-400 group-hover:text-black transition-colors">

@@ -1,70 +1,67 @@
 export default async function handler(req, res) {
-  // Extraímos as variáveis do sistema
-  const client_id = process.env.VITE_SPOTIFY_CLIENT_ID;
+  const client_id     = process.env.VITE_SPOTIFY_CLIENT_ID;
   const client_secret = process.env.VITE_SPOTIFY_CLIENT_SECRET;
   const refresh_token = process.env.VITE_SPOTIFY_REFRESH_TOKEN;
 
-  // Calculamos a chave base64
   const basic = Buffer.from(`${client_id}:${client_secret}`).toString('base64');
-  const TOKEN_ENDPOINT = `https://accounts.spotify.com/api/token`;
-  const NOW_PLAYING_ENDPOINT = `https://api.spotify.com/v1/me/player/currently-playing`;
+
+  const TOKEN_ENDPOINT        = 'https://accounts.spotify.com/api/token';
+  const NOW_PLAYING_ENDPOINT  = 'https://api.spotify.com/v1/me/player/currently-playing';
+  const RECENTLY_PLAYED_URL   = 'https://api.spotify.com/v1/me/player/recently-played?limit=6';
 
   try {
-    // 1ª Derivada: Trocar o refresh token por um token de acesso válido
-    const tokenResponse = await fetch(TOKEN_ENDPOINT, {
+    // Exchange refresh token for access token
+    const tokenRes = await fetch(TOKEN_ENDPOINT, {
       method: 'POST',
       headers: {
         Authorization: `Basic ${basic}`,
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: new URLSearchParams({
-        grant_type: 'refresh_token',
-        refresh_token: refresh_token,
-      }),
+      body: new URLSearchParams({ grant_type: 'refresh_token', refresh_token }),
     });
 
-    const tokenData = await tokenResponse.json();
-    const access_token = tokenData.access_token;
+    const { access_token } = await tokenRes.json();
+    const authHeader = { Authorization: `Bearer ${access_token}` };
 
-    // 2ª Derivada: Buscar a música tocando no momento
-    const songResponse = await fetch(NOW_PLAYING_ENDPOINT, {
-      headers: {
-        Authorization: `Bearer ${access_token}`,
-      },
-    });
+    // Fetch now-playing and recently-played in parallel
+    const [nowRes, recentRes] = await Promise.all([
+      fetch(NOW_PLAYING_ENDPOINT,  { headers: authHeader }),
+      fetch(RECENTLY_PLAYED_URL,   { headers: authHeader }),
+    ]);
 
-    // Se o status for 204, o Spotify não está tocando nada
-    if (songResponse.status === 204 || songResponse.status > 400) {
-      return res.status(200).json({ isPlaying: false });
+    // --- Now Playing ---
+    let nowPlaying = null;
+    if (nowRes.status === 200) {
+      const song = await nowRes.json();
+      if (song?.item) {
+        nowPlaying = {
+          isPlaying:     song.is_playing,
+          title:         song.item.name,
+          artist:        song.item.artists.map((a) => a.name).join(', '),
+          album:         song.item.album.name,
+          albumImageUrl: song.item.album.images[0]?.url ?? null,
+          songUrl:       song.item.external_urls.spotify,
+        };
+      }
     }
 
-    const song = await songResponse.json();
-
-    if (song.item === null) {
-      return res.status(200).json({ isPlaying: false });
+    // --- Recently Played ---
+    let recent = [];
+    if (recentRes.status === 200) {
+      const recentData = await recentRes.json();
+      recent = (recentData.items ?? []).map((item) => ({
+        title:         item.track.name,
+        artist:        item.track.artists.map((a) => a.name).join(', '),
+        album:         item.track.album.name,
+        albumImageUrl: item.track.album.images[0]?.url ?? null,
+        songUrl:       item.track.external_urls.spotify,
+        playedAt:      item.played_at,
+      }));
     }
 
-    // Simplificando o JSON para entregar apenas o necessário ao frontend
-    const isPlaying = song.is_playing;
-    const title = song.item.name;
-    const artist = song.item.artists.map((_artist) => _artist.name).join(', ');
-    const album = song.item.album.name;
-    const albumImageUrl = song.item.album.images[0].url;
-    const songUrl = song.item.external_urls.spotify;
-
-    // Adicionamos um cabeçalho de cache para otimizar o tempo de resposta (física do Vercel)
     res.setHeader('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=30');
-
-    // Retorna a função resolvida
-    return res.status(200).json({
-      album,
-      albumImageUrl,
-      artist,
-      isPlaying,
-      songUrl,
-      title,
-    });
+    return res.status(200).json({ nowPlaying, recent });
   } catch (error) {
-    return res.status(500).json({ isPlaying: false, message: 'Erro de cálculo no servidor.' });
+    return res.status(500).json({ nowPlaying: null, recent: [], message: 'Server error.' });
   }
 }

@@ -1,14 +1,36 @@
 <!doctype html>
-<html lang="en">
+<html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="public\img\icone-portfolio.jpg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>portfolio</title>
+    <meta name="description" content="Luiz Fernando Batista Moreira — Engenheiro de Software & Full Stack Developer. Java, Spring Boot, React, TypeScript." />
+    <meta name="theme-color" content="#050508" />
+
+    <title>Luiz Fernando — Software Engineer</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/jpeg" href="/img/icone-portfolio.jpg" />
+
+    <!-- Inter font — performance optimized (preconnect → stylesheet) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <!--
+      JetBrains Mono: used exclusively in the code card (Hero Section).
+      Inter: UI font for all other text.
+      display=swap: prevents invisible text flash (FOIT).
+    -->
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
-    <script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.72/build/spline-viewer.js"></script>
+    <!--
+      NOTE: The @splinetool/viewer script that was here has been REMOVED.
+      It was loading ~15MB of WebGL runtime on every page load, blocking
+      LCP and destroying Core Web Vitals. Background is now pure CSS + RAF.
+    -->
   </body>
 </html>

@@ -2,8 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * index.css — Tailwind entry point (imported by main.jsx).
+ * Design tokens live in App.css (imported by App.jsx).
+ * Do NOT add @tailwind directives to App.css.
+ */
+
 body {
-  background-color: #030014;
-  color: #f8fafc;
+  background-color: #06040F;
+  color: #F1F5F9;
   overflow-x: hidden;
 }
