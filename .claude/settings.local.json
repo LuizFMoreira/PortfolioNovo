@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(grep -r \"useState\\\\|useEffect\\\\|useContext\\\\|useReducer\" '/c/Users/bluiz/OneDrive/Desktop/Lab 03/pmg-es-2026-1-ti4-3126100-amavi-nutricao/Codigo/Gestao_pacientes/Gestao_pacientes/React/frontend/src' --include=*.tsx --include=*.ts)",
-      "Bash(grep -r \"debugger\\\\|console\\\\.\" '/c/Users/bluiz/OneDrive/Desktop/Lab 03/pmg-es-2026-1-ti4-3126100-amavi-nutricao/Codigo/Gestao_pacientes/Gestao_pacientes/React/frontend/src' --include=*.tsx --include=*.ts)",
-      "Bash(grep -r \"interface\\\\|type \" '/c/Users/bluiz/OneDrive/Desktop/Lab 03/pmg-es-2026-1-ti4-3126100-amavi-nutricao/Codigo/Gestao_pacientes/Gestao_pacientes/React/frontend/src' --include=*.tsx --include=*.ts)"
-    ]
-  }
-}
