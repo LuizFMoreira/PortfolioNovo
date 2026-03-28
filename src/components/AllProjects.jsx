@@ -1,276 +1,332 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  FaGithub, FaSearch, FaArrowLeft, FaCode, FaServer, FaLayerGroup,
-  FaReact, FaPython, FaNodeJs, FaJava, FaDocker 
+import { FaArrowLeft, FaArrowRight, FaGithub } from "react-icons/fa";
+import {
+  FaReact, FaPython, FaNodeJs, FaJava, FaDocker,
 } from "react-icons/fa";
-import { 
-  SiSpringboot, SiMysql, SiJavascript, SiTypescript, SiNextdotjs 
+import {
+  SiSpringboot, SiMysql, SiTypescript, SiNextdotjs,
 } from "react-icons/si";
-import { Link } from "react-router-dom";
-import { CardContainer, CardBody, CardItem } from "./ui/3d-card";
+import { Link, useNavigate } from "react-router-dom";
+import { projectsData } from "../data/projects";
 
-// ==========================================
-// MÁQUINA DE ESTADOS DO CARROSSEL
-// ==========================================
-const ImageCarousel = ({ images, altText }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
+const APPLE = [0.16, 1, 0.3, 1];
 
-  useEffect(() => {
-    if (!images || images.length <= 1) return;
-    const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
-    }, 3000); 
-    return () => clearInterval(interval);
-  }, [images]);
+// ─── Tech filter config ───────────────────────────────────────────────────────
+const TECH_FILTERS = [
+  { name: "Java",        icon: FaJava,       color: "#007396" },
+  { name: "Spring Boot", icon: SiSpringboot, color: "#6DB33F" },
+  { name: "React",       icon: FaReact,      color: "#61DAFB" },
+  { name: "Python",      icon: FaPython,     color: "#3776AB" },
+  { name: "TypeScript",  icon: SiTypescript, color: "#3178C6" },
+  { name: "Next.js",     icon: SiNextdotjs,  color: "#E8E8E8" },
+  { name: "MySQL",       icon: SiMysql,      color: "#4479A1" },
+  { name: "Node.js",     icon: FaNodeJs,     color: "#339933" },
+  { name: "Docker",      icon: FaDocker,     color: "#2496ED" },
+];
 
-  if (!images || images.length === 0) {
-    return <img src="https://via.placeholder.com/600x400/0f0728/38bdf8?text=Sem+Imagem" className="absolute inset-0 w-full h-full object-cover" alt="Placeholder" />;
-  }
+// ─── Tag accent colours ───────────────────────────────────────────────────────
+const TAG_STYLES = [
+  { bg: "rgba(124,58,237,0.15)", border: "rgba(124,58,237,0.3)",  color: "#A78BFA" },
+  { bg: "rgba(34,211,238,0.10)", border: "rgba(34,211,238,0.25)", color: "#67E8F9" },
+  { bg: "rgba(245,158,11,0.10)", border: "rgba(245,158,11,0.25)", color: "#FCD34D" },
+];
+
+// ─── Project card ─────────────────────────────────────────────────────────────
+const ProjectCard = ({ project, index, detailsLabel, githubLabel, onClick }) => {
+  const tagStyle = TAG_STYLES[index % TAG_STYLES.length];
 
   return (
-    <div className="relative w-full h-full overflow-hidden rounded-xl bg-black/50 group/carousel">
-      <AnimatePresence mode="wait">
-        <motion.img
-          key={currentIndex}
-          src={images[currentIndex]}
-          initial={{ opacity: 0, scale: 1.05 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.5, ease: "easeInOut" }}
-          className="absolute inset-0 w-full h-full object-cover opacity-90 group-hover/card:opacity-100 transition-opacity duration-300"
-          alt={`${altText} - frame ${currentIndex + 1}`}
-          onError={(e) => { e.target.src = `https://via.placeholder.com/600x400/0f0728/38bdf8?text=Erro`; }}
+    <motion.article
+      layout
+      initial={{ opacity: 0, y: 24 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.96 }}
+      transition={{ duration: 0.5, delay: index * 0.06, ease: APPLE }}
+      className="bento-card group cursor-pointer flex flex-col"
+      onClick={onClick}
+    >
+      {/* Image */}
+      <div className="relative overflow-hidden" style={{ aspectRatio: "16/9" }}>
+        <img
+          src={project.images[0]}
+          alt={project.alt}
+          loading="lazy"
+          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+          onError={(e) => { e.target.style.display = "none"; }}
         />
-      </AnimatePresence>
+        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/75 via-black/20 to-transparent pointer-events-none" />
 
-      {images.length > 1 && (
-        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5 z-20 bg-black/40 px-2 py-1 rounded-full backdrop-blur-md border border-white/10">
-          {images.map((_, idx) => (
-            <div key={idx} className={`h-1.5 rounded-full transition-all duration-300 ${idx === currentIndex ? 'w-4 bg-neon-cyan' : 'w-1.5 bg-white/40'}`} />
+        {/* Tag */}
+        <span
+          className="absolute top-3 left-3 text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full"
+          style={{
+            background: tagStyle.bg,
+            border: `1px solid ${tagStyle.border}`,
+            color: tagStyle.color,
+            backdropFilter: "blur(8px)",
+            WebkitBackdropFilter: "blur(8px)",
+          }}
+        >
+          {project.tag}
+        </span>
+
+        {/* Screenshot count */}
+        {project.images.length > 1 && (
+          <span
+            className="absolute bottom-3 right-3 text-[9px] font-mono px-2 py-0.5 rounded-full"
+            style={{
+              background: "rgba(0,0,0,0.55)",
+              border: "1px solid rgba(255,255,255,0.12)",
+              color: "rgba(255,255,255,0.6)",
+              backdropFilter: "blur(6px)",
+            }}
+          >
+            {project.images.length} imgs
+          </span>
+        )}
+      </div>
+
+      {/* Content */}
+      <div className="p-5 flex flex-col flex-1">
+        <h3 className="text-base font-bold text-white mb-2 group-hover:text-violet-300 transition-colors leading-snug">
+          {project.title}
+        </h3>
+        <p className="text-sm leading-relaxed mb-4 flex-1" style={{ color: "var(--color-text-3)" }}>
+          {project.description}
+        </p>
+
+        <div className="flex flex-wrap gap-1.5 mb-4">
+          {project.tech.map((chip, j) => (
+            <span key={j} className="tech-chip">{chip}</span>
           ))}
         </div>
-      )}
-      <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent pointer-events-none"></div>
-    </div>
+
+        <div
+          className="flex items-center gap-3 pt-3 border-t"
+          style={{ borderColor: "var(--color-border)" }}
+        >
+          <a
+            href={project.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="flex items-center gap-1.5 text-xs font-bold transition-colors"
+            style={{ color: "var(--color-text-3)" }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = "var(--color-text-1)")}
+            onMouseLeave={(e) => (e.currentTarget.style.color = "var(--color-text-3)")}
+          >
+            <FaGithub size={13} /> {githubLabel}
+          </a>
+          <button
+            className="flex items-center gap-1.5 text-xs font-bold ml-auto group/btn"
+            style={{ color: "var(--accent-violet)" }}
+          >
+            {detailsLabel}
+            <FaArrowRight size={10} className="group-hover/btn:translate-x-1 transition-transform" />
+          </button>
+        </div>
+      </div>
+    </motion.article>
   );
 };
 
-// ==========================================
-// COMPONENTE PRINCIPAL (GALERIA)
-// ==========================================
+// ─── AllProjects ──────────────────────────────────────────────────────────────
 const AllProjects = ({ language }) => {
-  const [filter, setFilter] = useState("all");
+  const navigate = useNavigate();
+  const [activeTech, setActiveTech] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Dicionário de Ícones Atualizado
-  const techIcons = {
-    "React": <FaReact className="text-[#61DAFB]" />,
-    "Next.js": <SiNextdotjs className="text-white" />,
-    "TypeScript": <SiTypescript className="text-[#3178C6]" />,
-    "Python": <FaPython className="text-[#3776AB]" />,
-    "Node.js": <FaNodeJs className="text-[#339933]" />,
-    "Java": <FaJava className="text-[#007396]" />,
-    "Spring Boot": <SiSpringboot className="text-[#6DB33F]" />,
-    "MySQL": <SiMysql className="text-[#4479A1]" />,
-    "Docker": <FaDocker className="text-[#2496ED]" />,
-    "JS": <SiJavascript className="text-[#F7DF1E]" />
-  };
+  const projects = projectsData[language] || projectsData["pt"];
 
-  // Matriz de Dados Bilíngue com Categorias
-  const allProjectsData = {
-    pt: [
-      {
-        id: 1,
-        title: "Re.use - Plataforma Sustentável",
-        category: "full",
-        description: "Plataforma digital para economia circular têxtil. Fluxo completo de cadastro, triagem e redistribuição.",
-        tech: ["Java", "Spring Boot", "MySQL", "Node.js"],
-        github: "https://github.com/ICEI-PUC-Minas-PMGES-TI/pmg-es-2025-1-ti2-3687100-brecho-re-use",
-        images: ["/img/Re.use/image.png", "/img/Re.use/image2.png", "/img/Re.use/image3.png", "/img/Re.use/image4.png", "/img/Re.use/image5.png"],
-      },
-      {
-        id: 2,
-        title: "IA Cirúrgica (Pesquisa)",
-        category: "full",
-        description: "Visão computacional (YOLOv8n) para identificar instrumentos cirúrgicos em tempo real.",
-        tech: ["Python", "Flask", "React", "Docker"],
-        github: "https://github.com/ICEI-PUC-Minas-PPLES-TI/plu-es-2025-2-extensao-software-saude-fhsfa",
-        images: ["/img/ProjetoExtensao/imagem3.jpeg", "/img/ProjetoExtensao/imagem4.jpeg", "/img/ProjetoExtensao/imagem5.jpeg"],
-      },
-      {
-        id: 3,
-        title: "Detalhes em Prata - E-commerce",
-        category: "full",
-        description: "Aplicação full-stack para e-commerce de joias. Back-end robusto construído com Java e Spring Boot.",
-        tech: ["Java", "Spring Boot", "TypeScript", "Next.js"],
-        github: "https://github.com/LuizFMoreira/seu-repositorio-joalheria",
-        images: ["/img/detalhesPrata/image.png", "/img/detalhesPrata/image2.png", "/img/detalhesPrata/image3.png"],
-      }
-    ],
-    en: [
-      {
-        id: 1,
-        title: "Re.use - Sustainable Platform",
-        category: "full",
-        description: "Digital platform for textile circular economy. Complete flow for registration, sorting, and redistribution.",
-        tech: ["Java", "Spring Boot", "MySQL", "Node.js"],
-        github: "https://github.com/ICEI-PUC-Minas-PMGES-TI/pmg-es-2025-1-ti2-3687100-brecho-re-use",
-        images: ["/img/Re.use/image.png", "/img/Re.use/image2.png", "/img/Re.use/image3.png", "/img/Re.use/image4.png", "/img/Re.use/image5.png"],
-      },
-      {
-        id: 2,
-        title: "Surgical AI (Research)",
-        category: "full",
-        description: "Computer vision (YOLOv8n) to identify surgical instruments in real-time.",
-        tech: ["Python", "Flask", "React", "Docker"],
-        github: "https://github.com/ICEI-PUC-Minas-PPLES-TI/plu-es-2025-2-extensao-software-saude-fhsfa",
-        images: ["/img/ProjetoExtensao/imagem3.jpeg", "/img/ProjetoExtensao/imagem4.jpeg", "/img/ProjetoExtensao/imagem5.jpeg"],
-      },
-      {
-        id: 3,
-        title: "Detalhes em Prata - E-commerce",
-        category: "full",
-        description: "Full-stack jewelry e-commerce application. Robust back-end built with Java and Spring Boot.",
-        tech: ["Java", "Spring Boot", "TypeScript", "Next.js"],
-        github: "https://github.com/LuizFMoreira/seu-repositorio-joalheria",
-        images: ["/img/detalhesPrata/image.png", "/img/detalhesPrata/image2.png", "/img/detalhesPrata/image3.png"],
-      }
-    ]
-  };
-
-  const allProjects = allProjectsData[language] || allProjectsData['pt'];
-
-  // Lógica de Filtragem Otimizada
-  const filteredProjects = useMemo(() => {
-    return allProjects.filter((p) => {
-      const matchesFilter = filter === "all" || p.category === filter;
-      const matchesSearch = p.tech.some(t => 
-        t.toLowerCase().includes(searchTerm.toLowerCase())
-      ) || p.title.toLowerCase().includes(searchTerm.toLowerCase());
-      return matchesFilter && matchesSearch;
+  const filtered = useMemo(() => {
+    return projects.filter((p) => {
+      const matchTech = !activeTech || p.tech.some(
+        (t) => t.toLowerCase() === activeTech.toLowerCase()
+      );
+      const s = searchTerm.toLowerCase();
+      const matchSearch =
+        !s ||
+        p.title.toLowerCase().includes(s) ||
+        p.tech.some((t) => t.toLowerCase().includes(s));
+      return matchTech && matchSearch;
     });
-  }, [filter, searchTerm, allProjects]);
+  }, [projects, activeTech, searchTerm]);
+
+  const isPt = language === "pt";
+  const t = {
+    back:    isPt ? "Voltar para Home"                    : "Back to Home",
+    label:   isPt ? "// galeria de projetos"              : "// project gallery",
+    title1:  isPt ? "TODOS OS"                            : "ALL MY",
+    title2:  isPt ? "PROJETOS."                           : "PROJECTS.",
+    filter:  isPt ? "Filtrar por tecnologia"              : "Filter by technology",
+    search:  isPt ? "Buscar projeto ou tecnologia…"       : "Search project or tech…",
+    details: isPt ? "Ver Dashboard"                       : "View Dashboard",
+    github:  "GitHub",
+    empty:   isPt ? "Nenhum projeto encontrado."          : "No projects found.",
+    count:   `${filtered.length} ${isPt ? (filtered.length !== 1 ? "projetos" : "projeto") : (filtered.length !== 1 ? "projects" : "project")}`,
+  };
 
   return (
-    <div className="min-h-screen bg-black text-white pt-32 px-6 pb-20 relative overflow-hidden">
-      {/* Glow de fundo */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-neon-cyan/5 via-transparent to-transparent pointer-events-none" />
-
+    <div
+      className="min-h-screen relative pb-24 px-6"
+      style={{ paddingTop: "clamp(5rem, 10vw, 7rem)" }}
+    >
       <div className="max-w-7xl mx-auto relative z-10">
-        <div className="flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
-          <Link to="/" className="flex items-center gap-2 text-slate-400 hover:text-neon-cyan transition-colors group">
-            <FaArrowLeft className="group-hover:-translate-x-1 transition-transform" /> 
-            {language === 'pt' ? 'Voltar para Home' : 'Back to Home'}
+
+        {/* ── Back ── */}
+        <motion.div
+          initial={{ opacity: 0, x: -16 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, ease: APPLE }}
+        >
+          <Link
+            to="/home"
+            className="inline-flex items-center gap-2 mb-14 text-sm transition-colors group"
+            style={{ color: "var(--color-text-3)" }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = "var(--color-text-1)")}
+            onMouseLeave={(e) => (e.currentTarget.style.color = "var(--color-text-3)")}
+          >
+            <FaArrowLeft size={12} className="group-hover:-translate-x-1 transition-transform" />
+            {t.back}
           </Link>
-          <h1 className="text-4xl md:text-5xl font-black tracking-tighter">
-            {language === 'pt' ? 'GALERIA DE PROJETOS' : 'PROJECT GALLERY'}
-          </h1>
-        </div>
+        </motion.div>
 
-        {/* Grade de Tecnologias */}
-        <div className="mb-12">
-          <p className="text-[10px] uppercase font-bold text-slate-500 mb-4 tracking-[0.2em] text-center md:text-left">
-            {language === 'pt' ? 'Filtrar por Tecnologia' : 'Filter by Tech'}
+        {/* ── Hero title ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 28 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.85, ease: APPLE }}
+          className="mb-14"
+        >
+          <p
+            className="text-[11px] font-mono tracking-[0.35em] uppercase mb-4"
+            style={{ color: "var(--color-text-3)" }}
+          >
+            {t.label}
           </p>
-          <div className="flex flex-wrap gap-4 justify-center md:justify-start">
-            {Object.entries(techIcons).map(([name, icon]) => (
+          <h1
+            className="font-black text-white leading-[0.9] mb-5"
+            style={{ fontSize: "clamp(3rem, 9vw, 7rem)", letterSpacing: "-0.03em" }}
+          >
+            {t.title1}
+            <br />
+            <span className="text-gradient">{t.title2}</span>
+          </h1>
+          <span className="accent-bar" />
+        </motion.div>
+
+        {/* ── Tech filter grid ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1, ease: APPLE }}
+          className="mb-10"
+        >
+          <p
+            className="text-[10px] font-mono tracking-[0.3em] uppercase mb-4"
+            style={{ color: "var(--color-text-3)" }}
+          >
+            {t.filter}
+          </p>
+          <div className="flex flex-wrap gap-3">
+            {TECH_FILTERS.map(({ name, icon: Icon, color }) => {
+              const active = activeTech === name;
+              return (
+                <button
+                  key={name}
+                  onClick={() => setActiveTech(active ? null : name)}
+                  className="flex items-center gap-2.5 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all duration-200"
+                  style={{
+                    background: active ? "rgba(124,58,237,0.18)" : "rgba(255,255,255,0.05)",
+                    border: active
+                      ? "1px solid rgba(124,58,237,0.55)"
+                      : "1px solid rgba(255,255,255,0.08)",
+                    color: active ? "#C4B5FD" : "var(--color-text-3)",
+                    boxShadow: active ? "0 0 16px rgba(124,58,237,0.15)" : "none",
+                  }}
+                >
+                  <Icon style={{ color: active ? color : undefined, fontSize: "1.1em", flexShrink: 0 }} />
+                  {name}
+                </button>
+              );
+            })}
+            {activeTech && (
               <button
-                key={name}
-                onClick={() => setSearchTerm(name === searchTerm ? "" : name)}
-                className={`flex flex-col items-center justify-center p-4 w-24 h-24 rounded-2xl border transition-all duration-300 group ${
-                  searchTerm.toLowerCase() === name.toLowerCase()
-                  ? 'bg-neon-cyan/20 border-neon-cyan shadow-[0_0_20px_rgba(34,211,238,0.2)]'
-                  : 'bg-white/5 border-white/10 hover:border-white/30'
-                }`}
+                onClick={() => setActiveTech(null)}
+                className="px-4 py-2.5 rounded-2xl text-xs font-bold transition-all"
+                style={{
+                  background: "rgba(255,255,255,0.04)",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  color: "var(--color-text-3)",
+                }}
               >
-                <div className={`text-3xl mb-2 transition-transform ${searchTerm.toLowerCase() === name.toLowerCase() ? 'scale-110' : 'grayscale group-hover:grayscale-0'}`}>
-                  {icon}
-                </div>
-                <span className="text-[10px] font-bold tracking-tight text-center">{name}</span>
+                ✕ limpar
               </button>
-            ))}
+            )}
           </div>
-        </div>
+        </motion.div>
 
-        {/* Filtros de Categoria e Busca */}
-        <div className="flex flex-col lg:flex-row gap-6 mb-16 items-center justify-between bg-white/5 p-4 rounded-3xl border border-white/10 backdrop-blur-md">
-          <div className="flex flex-wrap gap-2 p-1 bg-black/40 rounded-2xl">
-            {[
-              { id: 'all', label: 'Todos', icon: <FaLayerGroup /> },
-              { id: 'front', label: 'Front', icon: <FaCode /> },
-              { id: 'back', label: 'Back', icon: <FaServer /> },
-              { id: 'full', label: 'Full', icon: <FaLayerGroup /> }
-            ].map((cat) => (
-              <button
-                key={cat.id}
-                onClick={() => setFilter(cat.id)}
-                className={`flex items-center gap-2 px-6 py-2 rounded-xl text-xs font-bold transition-all ${
-                  filter === cat.id ? 'bg-neon-cyan text-black' : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                {cat.icon} {cat.label}
-              </button>
-            ))}
-          </div>
+        {/* ── Search + count ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.18, ease: APPLE }}
+          className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-12"
+        >
+          <input
+            type="text"
+            placeholder={t.search}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full sm:max-w-xs text-sm rounded-2xl py-3 px-5 outline-none transition-all"
+            style={{
+              background: "rgba(255,255,255,0.04)",
+              border: "1px solid rgba(124,58,237,0.22)",
+              color: "var(--color-text-1)",
+            }}
+            onFocus={(e) => {
+              e.target.style.borderColor = "rgba(124,58,237,0.65)";
+              e.target.style.background = "rgba(124,58,237,0.05)";
+            }}
+            onBlur={(e) => {
+              e.target.style.borderColor = "rgba(124,58,237,0.22)";
+              e.target.style.background = "rgba(255,255,255,0.04)";
+            }}
+          />
+          <span
+            className="text-[11px] font-mono tracking-widest uppercase sm:ml-auto"
+            style={{ color: "var(--color-text-3)" }}
+          >
+            {t.count}
+          </span>
+        </motion.div>
 
-          <div className="relative w-full lg:w-96">
-            <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
-            <input 
-              type="text"
-              placeholder={language === 'pt' ? "Buscar tecnologia..." : "Search tech..."}
-              className="w-full bg-black/60 border border-white/10 rounded-2xl py-4 pl-12 pr-4 focus:border-neon-cyan outline-none text-sm"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-        </div>
-
-        {/* Grid de Cards */}
-        <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {/* ── Grid ── */}
+        <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <AnimatePresence mode="popLayout">
-            {filteredProjects.map((project) => (
-              <motion.div
-                key={project.id}
-                layout
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.4 }}
+            {filtered.length === 0 ? (
+              <motion.p
+                key="empty"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="col-span-3 text-center py-24 text-sm"
+                style={{ color: "var(--color-text-3)" }}
               >
-                <CardContainer className="w-full h-full">
-                  <CardBody className="bg-black/40 backdrop-blur-md border border-white/10 hover:border-neon-cyan/40 w-full h-full rounded-3xl p-6 flex flex-col justify-between transition-all group/card">
-                    <div>
-                      <CardItem translateZ="50" className="text-xl font-bold text-white mb-2">{project.title}</CardItem>
-                      <CardItem translateZ="60" as="p" className="text-slate-400 text-sm mb-6 line-clamp-2 min-h-[40px]">{project.description}</CardItem>
-                      
-                      {/* Carrossel integrado perfeitamente no Z-index da Galeria */}
-                      <CardItem translateZ="100" className="w-full mb-6">
-                        <div className="h-44 w-full rounded-2xl relative border border-white/5 overflow-hidden">
-                           <ImageCarousel images={project.images} altText={project.title} />
-                        </div>
-                      </CardItem>
-                    </div>
-
-                    <div className="space-y-6">
-                      <CardItem translateZ="30" className="flex flex-wrap gap-2">
-                        {project.tech.map((t) => (
-                          <span key={t} className="text-[10px] font-mono bg-neon-cyan/10 text-neon-cyan border border-neon-cyan/20 px-2 py-1 rounded">
-                            {t}
-                          </span>
-                        ))}
-                      </CardItem>
-                      
-                      <CardItem translateZ="50" className="w-full">
-                        <a href={project.github} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full py-3 bg-white/5 border border-white/10 text-white font-bold rounded-xl hover:bg-neon-cyan hover:text-black transition-all">
-                          <FaGithub size={18} /> GitHub
-                        </a>
-                      </CardItem>
-                    </div>
-                  </CardBody>
-                </CardContainer>
-              </motion.div>
-            ))}
+                {t.empty}
+              </motion.p>
+            ) : (
+              filtered.map((project, i) => (
+                <ProjectCard
+                  key={project.id}
+                  project={project}
+                  index={i}
+                  detailsLabel={t.details}
+                  githubLabel={t.github}
+                  onClick={() => navigate(`/projetos/${project.id}`)}
+                />
+              ))
+            )}
           </AnimatePresence>
         </motion.div>
       </div>

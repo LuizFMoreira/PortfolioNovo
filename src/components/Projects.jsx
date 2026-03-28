@@ -1,76 +1,9 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaGithub, FaArrowRight } from "react-icons/fa";
-import { Link } from "react-router-dom";
-import ProjectModal from "./ProjectModal";
+import { Link, useNavigate } from "react-router-dom";
 
-// ─── Data ────────────────────────────────────────────────────────────────────
-const projectsData = {
-  pt: [
-    {
-      id: 1,
-      title: "Re.use — Plataforma Sustentável",
-      description: "Plataforma digital para economia circular têxtil. Fluxo completo de cadastro, triagem e redistribuição de peças de roupa.",
-      tech: ["Java", "Spring Boot", "MySQL", "Node.js"],
-      github: "https://github.com/ICEI-PUC-Minas-PMGES-TI/pmg-es-2025-1-ti2-3687100-brecho-re-use",
-      images: ["/img/Re.use/image.png", "/img/Re.use/image2.png", "/img/Re.use/image3.png", "/img/Re.use/image4.png", "/img/Re.use/image5.png"],
-      alt: "Re.use platform",
-      tag: "Projeto Principal",
-    },
-    {
-      id: 2,
-      title: "IA Cirúrgica",
-      description: "Visão computacional com YOLOv8n para identificar instrumentos cirúrgicos em tempo real.",
-      tech: ["Python", "Flask", "React", "YOLOv8n", "Docker"],
-      github: "https://github.com/ICEI-PUC-Minas-PPLES-TI/plu-es-2025-2-extensao-software-saude-fhsfa",
-      images: ["/img/ProjetoExtensao/imagem3.jpeg", "/img/ProjetoExtensao/imagem4.jpeg", "/img/ProjetoExtensao/image5.jpeg"],
-      alt: "Surgical AI",
-      tag: "Pesquisa",
-    },
-    {
-      id: 3,
-      title: "Detalhes em Prata",
-      description: "E-commerce full-stack para joias com Java, Spring Boot e Next.js.",
-      tech: ["Java", "Spring Boot", "TypeScript", "Next.js"],
-      github: "https://github.com/LuizFMoreira/seu-repositorio-joalheria",
-      images: ["/img/detalhesPrata/image.png", "/img/detalhesPrata/image2.png", "/img/detalhesPrata/image3.png"],
-      alt: "Detalhes em Prata",
-      tag: "E-commerce",
-    },
-  ],
-  en: [
-    {
-      id: 1,
-      title: "Re.use — Sustainable Platform",
-      description: "Digital platform for textile circular economy. Complete flow for registration, sorting, and redistribution of clothing.",
-      tech: ["Java", "Spring Boot", "MySQL", "Node.js"],
-      github: "https://github.com/ICEI-PUC-Minas-PMGES-TI/pmg-es-2025-1-ti2-3687100-brecho-re-use",
-      images: ["/img/Re.use/image.png", "/img/Re.use/image2.png", "/img/Re.use/image3.png", "/img/Re.use/image4.png", "/img/Re.use/image5.png"],
-      alt: "Re.use platform",
-      tag: "Main Project",
-    },
-    {
-      id: 2,
-      title: "Surgical AI",
-      description: "Computer vision with YOLOv8n to identify surgical instruments in real-time.",
-      tech: ["Python", "Flask", "React", "YOLOv8n", "Docker"],
-      github: "https://github.com/ICEI-PUC-Minas-PPLES-TI/plu-es-2025-2-extensao-software-saude-fhsfa",
-      images: ["/img/ProjetoExtensao/imagem3.jpeg", "/img/ProjetoExtensao/imagem4.jpeg", "/img/ProjetoExtensao/image5.jpeg"],
-      alt: "Surgical AI",
-      tag: "Research",
-    },
-    {
-      id: 3,
-      title: "Detalhes em Prata",
-      description: "Full-stack jewelry e-commerce with Java, Spring Boot, and Next.js.",
-      tech: ["Java", "Spring Boot", "TypeScript", "Next.js"],
-      github: "https://github.com/LuizFMoreira/seu-repositorio-joalheria",
-      images: ["/img/detalhesPrata/image.png", "/img/detalhesPrata/image2.png", "/img/detalhesPrata/image3.png"],
-      alt: "Detalhes em Prata",
-      tag: "E-commerce",
-    },
-  ],
-};
+import { projectsData } from "../data/projects";
 
 // ─── Auto-cycling image ───────────────────────────────────────────────────────
 import { useEffect } from "react";
@@ -109,8 +42,7 @@ const CyclingImage = ({ images, alt, aspectClass }) => {
 
 // ─── Projects ────────────────────────────────────────────────────────────────
 const Projects = ({ language }) => {
-  const [selectedProject, setSelectedProject] = useState(null);
-
+  const navigate = useNavigate();
   const projects = projectsData[language] || projectsData["pt"];
   const [featured, ...rest] = projects;
   const detailsLabel = language === "pt" ? "Detalhes" : "Details";
@@ -148,7 +80,7 @@ const Projects = ({ language }) => {
             viewport={{ once: true, margin: "-40px" }}
             transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
             className="lg:col-span-2 bento-card bento-card-featured group cursor-pointer"
-            onClick={() => setSelectedProject(featured)}
+            onClick={() => navigate(`/projetos/${featured.id}`)}
           >
             {/* Image */}
             <CyclingImage images={featured.images} alt={featured.alt} aspectClass="aspect-video" />
@@ -204,7 +136,7 @@ const Projects = ({ language }) => {
                 viewport={{ once: true, margin: "-30px" }}
                 transition={{ duration: 0.7, delay: 0.1 * (i + 1), ease: [0.16, 1, 0.3, 1] }}
                 className="bento-card group cursor-pointer flex-1 flex flex-col"
-                onClick={() => setSelectedProject(project)}
+                onClick={() => navigate(`/projetos/${project.id}`)}
               >
                 {/* Image */}
                 <CyclingImage images={project.images} alt={project.alt} aspectClass="aspect-[4/3]" />
@@ -275,13 +207,6 @@ const Projects = ({ language }) => {
         </div>
       </div>
 
-      {/* Modal */}
-      <ProjectModal
-        project={selectedProject}
-        isOpen={!!selectedProject}
-        onClose={() => setSelectedProject(null)}
-        language={language}
-      />
     </section>
   );
 };

@@ -6,12 +6,16 @@ import {
   useMotionValueEvent,
 } from "framer-motion";
 import { useLenis } from "@studio-freight/react-lenis";
-import { FaFileDownload } from "react-icons/fa"; // Importação do ícone de download curriculo
+import { useLocation, useNavigate } from "react-router-dom";
+import { FaFileDownload } from "react-icons/fa";
 
 const Navbar = ({ language, toggleLanguage }) => {
   const [scrolled, setScrolled] = useState(false);
   const { scrollY, scrollYProgress } = useScroll();
   const lenis = useLenis();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const isHome = location.pathname === "/home";
 
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 100,
@@ -21,12 +25,14 @@ const Navbar = ({ language, toggleLanguage }) => {
 
   const handleScrollTo = (e, href) => {
     e.preventDefault();
-    if (lenis) {
+    if (isHome && lenis) {
       lenis.scrollTo(href, {
         offset: -100,
         duration: 1.5,
         easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       });
+    } else {
+      navigate(`/home${href}`);
     }
   };
 
@@ -82,8 +88,8 @@ const Navbar = ({ language, toggleLanguage }) => {
           `}
         >
           <a
-            href="#home"
-            onClick={(e) => handleScrollTo(e, "#home")}
+            href="/home"
+            onClick={(e) => { e.preventDefault(); navigate('/home'); }}
             className="text-xl font-black text-white tracking-tighter hover:opacity-80 transition-opacity"
           >
             LF<span className="text-electric-violet">.</span>
