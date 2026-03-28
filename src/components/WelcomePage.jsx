@@ -81,7 +81,7 @@ const WelcomePage = ({ language }) => {
             <motion.span
               {...lineReveal(0.5)}
               className="font-black text-white block"
-              style={{ fontSize: 'clamp(5.5rem, 18vw, 14rem)', letterSpacing: '-0.05em' }}
+              style={{ fontSize: 'clamp(2.5rem, 15vw, 14rem)', letterSpacing: '-0.05em' }}
             >
               LUIZ
             </motion.span>
@@ -90,7 +90,7 @@ const WelcomePage = ({ language }) => {
             <motion.span
               {...lineReveal(0.72)}
               className="font-black text-gradient block"
-              style={{ fontSize: 'clamp(5.5rem, 18vw, 14rem)', letterSpacing: '-0.05em' }}
+              style={{ fontSize: 'clamp(2.5rem, 15vw, 14rem)', letterSpacing: '-0.05em' }}
             >
               FERNANDO.
             </motion.span>
@@ -119,10 +119,10 @@ const WelcomePage = ({ language }) => {
         {/* Tech */}
         <motion.p
           {...fadeUp(1.18)}
-          className="text-[11px] font-mono tracking-[0.3em] uppercase mb-14"
+          className="text-[11px] font-mono tracking-[0.1em] sm:tracking-[0.3em] uppercase mb-14"
           style={{ color: 'var(--color-text-3)' }}
         >
-          Java &nbsp;·&nbsp; Spring Boot &nbsp;·&nbsp; React &nbsp;·&nbsp; TypeScript
+          Java · Spring Boot · React · TypeScript
         </motion.p>
 
         {/* CTA */}
