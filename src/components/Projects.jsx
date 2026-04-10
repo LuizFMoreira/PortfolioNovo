@@ -5,35 +5,38 @@ import { Link, useNavigate } from "react-router-dom";
 
 import { projectsData } from "../data/projects";
 
-// ─── Auto-cycling image ───────────────────────────────────────────────────────
-import { useEffect } from "react";
+// ─── Auto-cycling image (só cicla no hover) ──────────────────────────────────
+import { useEffect, useRef } from "react";
 
 const CyclingImage = ({ images, alt, aspectClass }) => {
   const [idx, setIdx] = useState(0);
+  const [hovered, setHovered] = useState(false);
+  const intervalRef = useRef(null);
 
   useEffect(() => {
-    if (!images || images.length <= 1) return;
-    const id = setInterval(() => setIdx((i) => (i + 1) % images.length), 3500);
-    return () => clearInterval(id);
-  }, [images]);
+    if (!hovered || !images || images.length <= 1) {
+      clearInterval(intervalRef.current);
+      return;
+    }
+    intervalRef.current = setInterval(() => setIdx((i) => (i + 1) % images.length), 1800);
+    return () => clearInterval(intervalRef.current);
+  }, [hovered, images]);
 
   if (!images?.length) return null;
 
   return (
-    <div className={`relative overflow-hidden ${aspectClass}`}>
-      <AnimatePresence mode="wait">
-        <motion.img
-          key={idx}
-          src={images[idx]}
-          alt={`${alt} ${idx + 1}`}
-          initial={{ opacity: 0, scale: 1.04 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.5, ease: "easeInOut" }}
-          className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-          onError={(e) => { e.target.style.display = 'none'; }}
-        />
-      </AnimatePresence>
+    <div
+      className={`relative overflow-hidden ${aspectClass}`}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      <img
+        src={images[idx]}
+        alt={`${alt} ${idx + 1}`}
+        loading="lazy"
+        className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-700"
+        onError={(e) => { e.target.style.display = 'none'; }}
+      />
       {/* Bottom gradient */}
       <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 via-black/30 to-transparent pointer-events-none" />
     </div>
@@ -71,92 +74,90 @@ const Projects = ({ language }) => {
         </motion.div>
 
         {/* ── BENTO GRID ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-10">
+        <div className="flex flex-col gap-5 mb-10">
 
-          {/* ── Featured — spans 2 cols ── */}
+          {/* ── Featured — linha completa ── */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-40px" }}
             transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-            className="lg:col-span-2 bento-card bento-card-featured group cursor-pointer"
+            className="bento-card bento-card-featured group cursor-pointer"
             onClick={() => navigate(`/projetos/${featured.id}`)}
           >
-            {/* Image */}
-            <CyclingImage images={featured.images} alt={featured.alt} aspectClass="aspect-video" />
+            <div className="grid lg:grid-cols-[1fr_420px] gap-0">
+              {/* Imagem */}
+              <CyclingImage images={featured.images} alt={featured.alt} aspectClass="aspect-video lg:aspect-auto lg:min-h-[280px]" />
 
-            {/* Content */}
-            <div className="p-6">
-              {/* Tag */}
-              <span className="inline-block text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full mb-3"
-                style={{ background: 'rgba(124,58,237,0.15)', border: '1px solid rgba(124,58,237,0.3)', color: '#A78BFA' }}>
-                {featured.tag}
-              </span>
-
-              <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-violet-300 transition-colors">
-                {featured.title}
-              </h3>
-              <p className="text-sm leading-relaxed mb-4" style={{ color: 'var(--color-text-2)' }}>
-                {featured.description}
-              </p>
-
-              <div className="flex flex-wrap gap-2 mb-5">
-                {featured.tech.map((t, i) => <span key={i} className="tech-chip">{t}</span>)}
-              </div>
-
-              <div className="flex items-center gap-3">
-                <a
-                  href={featured.github}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-white transition-all"
-                  style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.10)' }}
-                >
-                  <FaGithub size={14} /> GitHub
-                </a>
-                <button
-                  className="flex items-center gap-2 text-sm font-bold group/btn"
-                  style={{ color: 'var(--accent-violet)' }}
-                >
-                  {detailsLabel}
-                  <FaArrowRight size={12} className="group-hover/btn:translate-x-1 transition-transform" />
-                </button>
+              {/* Content */}
+              <div className="p-7 flex flex-col justify-center">
+                <span className="inline-block text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full mb-4 w-fit"
+                  style={{ background: 'rgba(124,58,237,0.15)', border: '1px solid rgba(124,58,237,0.3)', color: '#A78BFA' }}>
+                  {featured.tag}
+                </span>
+                <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-violet-300 transition-colors">
+                  {featured.title}
+                </h3>
+                <p className="text-sm leading-relaxed mb-5" style={{ color: 'var(--color-text-2)' }}>
+                  {featured.description}
+                </p>
+                <div className="flex flex-wrap gap-2 mb-6">
+                  {featured.tech.map((t, i) => <span key={i} className="tech-chip">{t}</span>)}
+                </div>
+                <div className="flex items-center gap-3">
+                  <a
+                    href={featured.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-white transition-all"
+                    style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.10)' }}
+                  >
+                    <FaGithub size={14} /> GitHub
+                  </a>
+                  <button
+                    className="flex items-center gap-2 text-sm font-bold group/btn"
+                    style={{ color: 'var(--accent-violet)' }}
+                  >
+                    {detailsLabel}
+                    <FaArrowRight size={12} className="group-hover/btn:translate-x-1 transition-transform" />
+                  </button>
+                </div>
               </div>
             </div>
           </motion.div>
 
-          {/* ── Small cards — 1 col each ── */}
-          <div className="flex flex-col gap-5">
+          {/* ── 3 cards em linha ── */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {rest.map((project, i) => (
               <motion.div
                 key={project.id}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-30px" }}
-                transition={{ duration: 0.7, delay: 0.1 * (i + 1), ease: [0.16, 1, 0.3, 1] }}
-                className="bento-card group cursor-pointer flex-1 flex flex-col"
+                transition={{ duration: 0.7, delay: 0.08 * i, ease: [0.16, 1, 0.3, 1] }}
+                className="bento-card group cursor-pointer flex flex-col"
                 onClick={() => navigate(`/projetos/${project.id}`)}
               >
                 {/* Image */}
-                <CyclingImage images={project.images} alt={project.alt} aspectClass="aspect-[4/3]" />
+                <CyclingImage images={project.images} alt={project.alt} aspectClass="aspect-video" />
 
                 {/* Content */}
                 <div className="p-5 flex flex-col flex-1">
-                  <span className="inline-block text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full mb-2 w-fit"
+                  <span className="inline-block text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full mb-3 w-fit"
                     style={{ background: 'rgba(34,211,238,0.10)', border: '1px solid rgba(34,211,238,0.22)', color: '#67E8F9' }}>
                     {project.tag}
                   </span>
-                  <h3 className="text-base font-bold text-white mb-1.5 group-hover:text-violet-300 transition-colors">
+                  <h3 className="text-base font-bold text-white mb-2 group-hover:text-violet-300 transition-colors">
                     {project.title}
                   </h3>
-                  <p className="text-xs leading-relaxed mb-3 flex-1" style={{ color: 'var(--color-text-3)' }}>
+                  <p className="text-xs leading-relaxed mb-4 flex-1" style={{ color: 'var(--color-text-3)' }}>
                     {project.description}
                   </p>
-                  <div className="flex flex-wrap gap-1.5 mb-3">
+                  <div className="flex flex-wrap gap-1.5 mb-4">
                     {project.tech.slice(0, 3).map((t, j) => <span key={j} className="tech-chip">{t}</span>)}
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 mt-auto">
                     <a
                       href={project.github}
                       target="_blank"

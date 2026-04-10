@@ -8,9 +8,11 @@ import About from "./components/About";
 import Projects from "./components/Projects";
 import Experience from "./components/Experience";
 import Music from "./components/Music";
+import Books from "./components/Books";
 import Contact from "./components/Contact";
 import Footer from "./components/Footer";
 import AllProjects from "./components/AllProjects";
+import AllBooks from "./components/AllBooks";
 import ProjectDetail from "./components/ProjectDetail";
 import WelcomePage from "./components/WelcomePage";
 import "./App.css";
@@ -54,6 +56,7 @@ function AppInner({ language, toggleLanguage }) {
                   <Projects language={language} />
                   <Experience language={language} />
                   <Music language={language} />
+                  <Books language={language} />
                   <Contact language={language} />
                 </>
               }
@@ -61,6 +64,9 @@ function AppInner({ language, toggleLanguage }) {
 
             {/* ── Gallery ── */}
             <Route path="/todos-projetos" element={<AllProjects language={language} />} />
+
+            {/* ── Bookshelf ── */}
+            <Route path="/livros" element={<AllBooks language={language} />} />
 
             {/* ── Project dashboard ── */}
             <Route path="/projetos/:id" element={<ProjectDetail language={language} />} />
@@ -70,6 +76,7 @@ function AppInner({ language, toggleLanguage }) {
         {/* Footer hidden on welcome page */}
         {!isWelcome && <Footer />}
       </div>
+
     </div>
   );
 }
@@ -91,7 +98,7 @@ function App() {
 
   return (
     <ReactLenis root options={lenisOptions}>
-      <Router>
+      <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <AppInner language={language} toggleLanguage={toggleLanguage} />
       </Router>
     </ReactLenis>

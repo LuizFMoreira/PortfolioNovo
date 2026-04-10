@@ -57,6 +57,7 @@ const Navbar = ({ language, toggleLanguage }) => {
           { name: "Projetos", href: "#projetos" },
           { name: "Experiência", href: "#experiencias" },
           { name: "Música", href: "#musica" },
+          { name: "Livros", href: "#livros" },
           { name: "Contato", href: "#contato" },
         ]
       : [
@@ -64,6 +65,7 @@ const Navbar = ({ language, toggleLanguage }) => {
           { name: "Projects", href: "#projetos" },
           { name: "Experience", href: "#experiencias" },
           { name: "Music", href: "#musica" },
+          { name: "Books", href: "#livros" },
           { name: "Contact", href: "#contato" },
         ];
 

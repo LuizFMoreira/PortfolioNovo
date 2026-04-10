@@ -53,6 +53,20 @@ export const projectsData = {
       tag: "E-commerce",
       category: "full",
     },
+    {
+      id: 4,
+      title: "Portfolio Pessoal",
+      description:
+        "Portfolio desenvolvido na disciplina de Laboratório de Software (PUC Minas). Design inspirado no estilo Apple com animações fluidas, tema escuro, suporte bilíngue PT/EN e integração com Spotify.",
+      tech: ["React", "Vite", "Tailwind CSS", "Framer Motion", "TypeScript"],
+      github: "https://github.com/LuizFMoreira/PortfolioNovo",
+      images: [
+        "/img/icone-portfolio.jpg",
+      ],
+      alt: "Portfolio Pessoal",
+      tag: "Lab. de Software",
+      category: "full",
+    },
   ],
   en: [
     {
@@ -105,6 +119,20 @@ export const projectsData = {
       ],
       alt: "Detalhes em Prata",
       tag: "E-commerce",
+      category: "full",
+    },
+    {
+      id: 4,
+      title: "Personal Portfolio",
+      description:
+        "Portfolio built for the Software Laboratory course (PUC Minas). Apple-inspired design with fluid animations, dark theme, PT/EN bilingual support, and Spotify integration.",
+      tech: ["React", "Vite", "Tailwind CSS", "Framer Motion", "TypeScript"],
+      github: "https://github.com/LuizFMoreira/PortfolioNovo",
+      images: [
+        "/img/icone-portfolio.jpg",
+      ],
+      alt: "Personal Portfolio",
+      tag: "Software Lab",
       category: "full",
     },
   ],

@@ -1,4 +1,45 @@
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import {
+  FaGraduationCap,
+  FaBriefcase,
+  FaBookOpen,
+  FaCode,
+} from 'react-icons/fa';
+
+// ─── Última atualização ───────────────────────────────────────────────────────
+const LAST_UPDATE = new Date('2026-04-07');
+
+const ACTIVITIES = {
+  pt: [
+    { icon: FaGraduationCap, label: 'Estudando', title: 'Grafos & Algoritmos II', sub: 'PUC Minas · 4º período', accent: '#A78BFA', glow: 'rgba(167,139,250,0.35)' },
+    { icon: FaBriefcase,     label: 'Trabalhando em', title: 'Backend Groohub',  sub: 'NestJS · TypeScript · PostgreSQL', accent: '#22D3EE', glow: 'rgba(34,211,238,0.35)' },
+    { icon: FaCode,          label: 'Construindo',    title: 'Sistema RLS & HTTPS', sub: 'Padrões de projeto · Métodos ágeis', accent: '#F59E0B', glow: 'rgba(245,158,11,0.35)' },
+    { icon: FaBookOpen,      label: 'Lendo',          title: 'Clean Architecture', sub: 'Robert C. Martin', accent: '#10B981', glow: 'rgba(16,185,129,0.35)' },
+  ],
+  en: [
+    { icon: FaGraduationCap, label: 'Studying',    title: 'Graphs & Algorithms II', sub: 'PUC Minas · 4th semester', accent: '#A78BFA', glow: 'rgba(167,139,250,0.35)' },
+    { icon: FaBriefcase,     label: 'Working on',  title: 'Groohub Backend', sub: 'NestJS · TypeScript · PostgreSQL', accent: '#22D3EE', glow: 'rgba(34,211,238,0.35)' },
+    { icon: FaCode,          label: 'Building',    title: 'RLS & HTTPS System', sub: 'Design patterns · Agile methods', accent: '#F59E0B', glow: 'rgba(245,158,11,0.35)' },
+    { icon: FaBookOpen,      label: 'Reading',     title: 'Clean Architecture', sub: 'Robert C. Martin', accent: '#10B981', glow: 'rgba(16,185,129,0.35)' },
+  ],
+};
+
+const getTimeAgo = (lang) => {
+  const diffDays = Math.floor((new Date() - LAST_UPDATE) / 86400000);
+  if (lang === 'pt') {
+    if (diffDays === 0) return 'hoje';
+    if (diffDays === 1) return 'ontem';
+    if (diffDays < 7)  return `há ${diffDays} dias`;
+    if (diffDays < 30) return `há ${Math.floor(diffDays / 7)} sem`;
+    return `há ${Math.floor(diffDays / 30)} mês${Math.floor(diffDays / 30) > 1 ? 'es' : ''}`;
+  }
+  if (diffDays === 0) return 'today';
+  if (diffDays === 1) return 'yesterday';
+  if (diffDays < 7)  return `${diffDays}d ago`;
+  if (diffDays < 30) return `${Math.floor(diffDays / 7)}w ago`;
+  return `${Math.floor(diffDays / 30)}mo ago`;
+};
 
 const fadeUp = {
   hidden: { opacity: 0, y: 32 },
@@ -20,6 +61,133 @@ const STATS_EN = [
   { n: '3+',  label: 'Projects',  sub: 'Built and shipped' },
   { n: 'PUC', label: 'Minas',     sub: 'Pontifical University' },
 ];
+
+const CurrentlyBlock = ({ language }) => {
+  const [index, setIndex] = useState(0);
+  const activities = ACTIVITIES[language] || ACTIVITIES.pt;
+  const current = activities[index];
+  const Icon = current.icon;
+  const timeAgo = getTimeAgo(language);
+  const label = language === 'pt' ? 'Agora' : 'Now';
+  const updated = language === 'pt' ? 'atualizado' : 'updated';
+
+  useEffect(() => {
+    const id = setInterval(() => setIndex((i) => (i + 1) % activities.length), 4500);
+    return () => clearInterval(id);
+  }, [activities.length]);
+
+  useEffect(() => { setIndex(0); }, [language]);
+
+  return (
+    <motion.div
+      variants={fadeUp}
+      className="bento-card overflow-hidden relative"
+      style={{ background: 'rgba(13,10,30,0.55)' }}
+    >
+      {/* Glow dinâmico */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: `radial-gradient(ellipse at 10% 50%, ${current.glow} 0%, transparent 60%)`,
+          transition: 'background 0.8s ease',
+        }}
+      />
+
+      <div className="relative p-6 flex flex-col gap-5">
+
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inset-0 rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative rounded-full h-2 w-2 bg-emerald-400 block" />
+            </span>
+            <span className="text-[9px] font-mono font-bold tracking-[0.28em] uppercase" style={{ color: '#10B981' }}>
+              {label}
+            </span>
+          </div>
+          <span className="text-[9px] font-mono tracking-[0.12em]" style={{ color: 'var(--color-text-3)' }}>
+            {updated} {timeAgo}
+          </span>
+        </div>
+
+        {/* Atividade em destaque */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, x: 12 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -12 }}
+            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            className="flex items-center gap-4"
+          >
+            {/* Ícone grande */}
+            <div
+              className="flex-shrink-0 w-14 h-14 flex items-center justify-center rounded-2xl"
+              style={{
+                background: `${current.accent}15`,
+                border: `1px solid ${current.accent}35`,
+                boxShadow: `0 0 24px ${current.glow}`,
+              }}
+            >
+              <Icon size={22} style={{ color: current.accent }} />
+            </div>
+
+            {/* Texto */}
+            <div className="min-w-0 flex-1">
+              <p
+                className="text-[9px] font-mono font-bold tracking-[0.22em] uppercase mb-1"
+                style={{ color: current.accent }}
+              >
+                {current.label}
+              </p>
+              <p className="text-base font-bold text-white leading-tight mb-0.5 truncate">
+                {current.title}
+              </p>
+              <p className="text-xs font-light truncate" style={{ color: 'var(--color-text-2)' }}>
+                {current.sub}
+              </p>
+            </div>
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Indicadores das outras atividades */}
+        <div className="flex items-center gap-2">
+          {activities.map((a, i) => {
+            const AIcon = a.icon;
+            const isActive = i === index;
+            return (
+              <button
+                key={i}
+                onClick={() => setIndex(i)}
+                title={a.title}
+                className="flex items-center justify-center rounded-lg transition-all duration-300"
+                style={{
+                  width: isActive ? '36px' : '28px',
+                  height: '28px',
+                  background: isActive ? `${a.accent}20` : 'rgba(255,255,255,0.04)',
+                  border: `1px solid ${isActive ? `${a.accent}50` : 'rgba(255,255,255,0.08)'}`,
+                  boxShadow: isActive ? `0 0 12px ${a.glow}` : 'none',
+                }}
+              >
+                <AIcon size={11} style={{ color: isActive ? a.accent : 'rgba(255,255,255,0.3)' }} />
+              </button>
+            );
+          })}
+
+          {/* Contador */}
+          <span
+            className="ml-auto text-[9px] font-mono tracking-[0.15em]"
+            style={{ color: 'var(--color-text-3)' }}
+          >
+            {String(index + 1).padStart(2, '0')}/{String(activities.length).padStart(2, '0')}
+          </span>
+        </div>
+
+      </div>
+    </motion.div>
+  );
+};
 
 const About = ({ language }) => {
   const content = {
@@ -99,6 +267,17 @@ const About = ({ language }) => {
               <span className="text-xs" style={{ color: 'var(--color-text-3)' }}>{s.sub}</span>
             </motion.div>
           ))}
+        </motion.div>
+
+        {/* ── CURRENTLY ── */}
+        <motion.div
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: '-40px' }}
+          variants={stagger}
+          className="mb-8"
+        >
+          <CurrentlyBlock language={language} />
         </motion.div>
 
         {/* ── TEXT + QUOTE ── */}

@@ -68,10 +68,10 @@ const Contact = ({ language }) => {
   };
 
   const socialLinks = [
-    { icon: FaLinkedin,  href: "https://linkedin.com/in/seu-linkedin", label: "LinkedIn"  },
-    { icon: FaGithub,    href: "https://github.com/seu-github",        label: "GitHub"    },
-    { icon: FaWhatsapp,  href: "https://wa.me/5531999999999",          label: "WhatsApp"  },
-    { icon: FaEnvelope,  href: "mailto:contato@luizfernando.dev",      label: "Email"     },
+    { icon: FaLinkedin,  href: "https://www.linkedin.com/in/luiz-fernando-batista-moreira-987834218/", label: "LinkedIn"  },
+    { icon: FaGithub,    href: "https://github.com/LuizFMoreira",                                      label: "GitHub"    },
+    { icon: FaWhatsapp,  href: "https://wa.me/5531999999999",                                          label: "WhatsApp"  },
+    { icon: FaEnvelope,  href: "mailto:bluizfernando720@gmail.com",                                    label: "Email"     },
   ];
 
   const getFieldStyle = (name) => ({

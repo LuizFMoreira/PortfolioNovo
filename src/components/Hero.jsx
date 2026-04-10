@@ -207,9 +207,7 @@ const Hero = ({ language }) => {
               />
 
               {/* ── Floating: Available badge — top-right ── */}
-              <motion.div
-                animate={{ y: [0, -6, 0] }}
-                transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
+              <div
                 className="absolute top-5 right-5 flex items-center gap-2 px-3 py-2 rounded-full"
                 style={{
                   background: 'rgba(16,185,129,0.10)',
@@ -225,7 +223,7 @@ const Hero = ({ language }) => {
                 <span className="text-[10px] font-semibold uppercase tracking-[0.2em]" style={{ color: '#10B981' }}>
                   {t.status}
                 </span>
-              </motion.div>
+              </div>
 
             </div>
           </motion.div>

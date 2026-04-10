@@ -12,15 +12,27 @@ const Background = () => {
     let targetX = 0, targetY = 0;
     let currentX = 0, currentY = 0;
     let rafId;
+    let isMoving = false;
+    let idleTimeout;
 
     const lerp = (a, b, t) => a + (b - a) * t;
 
     const handleMouseMove = (e) => {
-      targetX = (e.clientX / window.innerWidth  - 0.5) * 80;
-      targetY = (e.clientY / window.innerHeight - 0.5) * 80;
+      targetX = (e.clientX / window.innerWidth  - 0.5) * 60;
+      targetY = (e.clientY / window.innerHeight - 0.5) * 60;
+      if (!isMoving) {
+        isMoving = true;
+        orb.style.willChange = 'transform';
+        tick();
+      }
+      clearTimeout(idleTimeout);
+      idleTimeout = setTimeout(() => {
+        isMoving = false;
+        cancelAnimationFrame(rafId);
+        orb.style.willChange = 'auto';
+      }, 150);
     };
 
-    orb.style.willChange = 'transform';
     const tick = () => {
       currentX = lerp(currentX, targetX, 0.06);
       currentY = lerp(currentY, targetY, 0.06);
@@ -29,10 +41,10 @@ const Background = () => {
       rafId = requestAnimationFrame(tick);
     };
 
-    rafId = requestAnimationFrame(tick);
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
     return () => {
       cancelAnimationFrame(rafId);
+      clearTimeout(idleTimeout);
       window.removeEventListener('mousemove', handleMouseMove);
     };
   }, []);
@@ -40,63 +52,57 @@ const Background = () => {
   return (
     <div className="fixed inset-0 overflow-hidden pointer-events-none">
 
-      {/* ── Blob 1: Electric Violet — top-left ── */}
+      {/* ── Blob 1: Electric Violet — top-left (reduzido de 1000→700, blur 120→80) ── */}
       <div
         className="absolute rounded-full animate-aurora-1"
         style={{
-          width: 1000, height: 1000,
+          width: 700, height: 700,
           top: '-15%', left: '-10%',
           background: 'radial-gradient(circle, #7C3AED 0%, transparent 70%)',
           opacity: 0.13,
-          filter: 'blur(120px)',
+          filter: 'blur(80px)',
+          willChange: 'transform',
         }}
       />
 
-      {/* ── Blob 2: Neon Cyan — middle-right ── */}
+      {/* ── Blob 2: Neon Cyan — middle-right (800→600, blur 100→70) ── */}
       <div
         className="absolute rounded-full animate-aurora-2"
         style={{
-          width: 800, height: 800,
+          width: 600, height: 600,
           top: '30%', right: '-5%',
           background: 'radial-gradient(circle, #22D3EE 0%, transparent 70%)',
           opacity: 0.10,
-          filter: 'blur(100px)',
+          filter: 'blur(70px)',
+          willChange: 'transform',
         }}
       />
 
-      {/* ── Blob 3: Indigo — bottom-center ── */}
+      {/* ── Blob 3: Indigo — bottom-center (700→500, blur 120→80) ── */}
       <div
         className="absolute rounded-full animate-aurora-3"
         style={{
-          width: 700, height: 700,
+          width: 500, height: 500,
           bottom: '-5%', left: '28%',
           background: 'radial-gradient(circle, #4F46E5 0%, transparent 70%)',
           opacity: 0.11,
-          filter: 'blur(120px)',
-        }}
-      />
-
-      {/* ── Blob 4: Violet-glow — top-right ── */}
-      <div
-        className="absolute rounded-full animate-aurora-4"
-        style={{
-          width: 500, height: 500,
-          top: '5%', right: '20%',
-          background: 'radial-gradient(circle, #9333EA 0%, transparent 70%)',
-          opacity: 0.08,
           filter: 'blur(80px)',
+          willChange: 'transform',
         }}
       />
 
-      {/* ── Mouse-reactive violet orb ── */}
+      {/* ── Blob 4 removido — era o menor e menos visível ── */}
+
+      {/* ── Mouse-reactive violet orb (600→400, blur 80→60) ── */}
       <div
         ref={orbRef}
         className="absolute rounded-full"
         style={{
-          width: 600, height: 600,
+          width: 400, height: 400,
           top: '50%', left: '50%',
-          background: 'radial-gradient(circle, rgba(124,58,237,0.18) 0%, transparent 70%)',
-          filter: 'blur(80px)',
+          background: 'radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 70%)',
+          filter: 'blur(60px)',
+          transform: 'translate3d(-50%, -50%, 0)',
         }}
       />
 
