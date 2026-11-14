@@ -1,215 +1,26 @@
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { FaGithub, FaArrowRight } from "react-icons/fa";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { useLanguage } from "../context/LanguageContext";
+import ProjectCase from "./ProjectCase";
+import SectionHeader from "./SectionHeader";
 
-import { projectsData } from "../data/projects";
-
-// ─── Auto-cycling image (só cicla no hover) ──────────────────────────────────
-import { useEffect, useRef } from "react";
-
-const CyclingImage = ({ images, alt, aspectClass }) => {
-  const [idx, setIdx] = useState(0);
-  const [hovered, setHovered] = useState(false);
-  const intervalRef = useRef(null);
-
-  useEffect(() => {
-    if (!hovered || !images || images.length <= 1) {
-      clearInterval(intervalRef.current);
-      return;
-    }
-    intervalRef.current = setInterval(() => setIdx((i) => (i + 1) % images.length), 1800);
-    return () => clearInterval(intervalRef.current);
-  }, [hovered, images]);
-
-  if (!images?.length) return null;
+export default function Projects() {
+  const { t } = useLanguage();
 
   return (
-    <div
-      className={`relative overflow-hidden ${aspectClass}`}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-      <img
-        src={images[idx]}
-        alt={`${alt} ${idx + 1}`}
-        loading="lazy"
-        className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-700"
-        onError={(e) => { e.target.style.display = 'none'; }}
-      />
-      {/* Bottom gradient */}
-      <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 via-black/30 to-transparent pointer-events-none" />
-    </div>
-  );
-};
+    <section id="projetos" aria-labelledby="projetos-titulo" className="container-page py-20 md:py-28">
+      <SectionHeader id="projetos-titulo" title={t.projects.title} intro={t.projects.intro} />
 
-// ─── Projects ────────────────────────────────────────────────────────────────
-const Projects = ({ language }) => {
-  const navigate = useNavigate();
-  const projects = projectsData[language] || projectsData["pt"];
-  const [featured, ...rest] = projects;
-  const detailsLabel = language === "pt" ? "Detalhes" : "Details";
-  const sectionTitle = language === "pt" ? "Projetos & Pesquisa." : "Projects & Research.";
-  const viewAllLabel = language === "pt" ? "Ver Todos os Projetos" : "View All Projects";
-
-  return (
-    <section id="projetos" className="py-28 px-6 relative z-10">
-      <div className="max-w-7xl mx-auto">
-
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-50px" }}
-          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          className="mb-12"
-        >
-          <p className="text-[11px] font-mono tracking-[0.35em] uppercase mb-3" style={{ color: 'var(--color-text-3)' }}>
-            // projects
-          </p>
-          <h2 className="text-4xl md:text-5xl font-extrabold text-white tracking-tight mb-4">
-            {sectionTitle}
-          </h2>
-          <span className="accent-bar" />
-        </motion.div>
-
-        {/* ── BENTO GRID ── */}
-        <div className="flex flex-col gap-5 mb-10">
-
-          {/* ── Featured — linha completa ── */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-40px" }}
-            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-            className="bento-card bento-card-featured group cursor-pointer"
-            onClick={() => navigate(`/projetos/${featured.id}`)}
-          >
-            <div className="grid lg:grid-cols-[1fr_420px] gap-0">
-              {/* Imagem */}
-              <CyclingImage images={featured.images} alt={featured.alt} aspectClass="aspect-video lg:aspect-auto lg:min-h-[280px]" />
-
-              {/* Content */}
-              <div className="p-7 flex flex-col justify-center">
-                <span className="inline-block text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full mb-4 w-fit"
-                  style={{ background: 'rgba(124,58,237,0.15)', border: '1px solid rgba(124,58,237,0.3)', color: '#A78BFA' }}>
-                  {featured.tag}
-                </span>
-                <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-violet-300 transition-colors">
-                  {featured.title}
-                </h3>
-                <p className="text-sm leading-relaxed mb-5" style={{ color: 'var(--color-text-2)' }}>
-                  {featured.description}
-                </p>
-                <div className="flex flex-wrap gap-2 mb-6">
-                  {featured.tech.map((t, i) => <span key={i} className="tech-chip">{t}</span>)}
-                </div>
-                <div className="flex items-center gap-3">
-                  <a
-                    href={featured.github}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={(e) => e.stopPropagation()}
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-white transition-all"
-                    style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.10)' }}
-                  >
-                    <FaGithub size={14} /> GitHub
-                  </a>
-                  <button
-                    className="flex items-center gap-2 text-sm font-bold group/btn"
-                    style={{ color: 'var(--accent-violet)' }}
-                  >
-                    {detailsLabel}
-                    <FaArrowRight size={12} className="group-hover/btn:translate-x-1 transition-transform" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* ── 3 cards em linha ── */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {rest.map((project, i) => (
-              <motion.div
-                key={project.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-30px" }}
-                transition={{ duration: 0.7, delay: 0.08 * i, ease: [0.16, 1, 0.3, 1] }}
-                className="bento-card group cursor-pointer flex flex-col"
-                onClick={() => navigate(`/projetos/${project.id}`)}
-              >
-                {/* Image */}
-                <CyclingImage images={project.images} alt={project.alt} aspectClass="aspect-video" />
-
-                {/* Content */}
-                <div className="p-5 flex flex-col flex-1">
-                  <span className="inline-block text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full mb-3 w-fit"
-                    style={{ background: 'rgba(34,211,238,0.10)', border: '1px solid rgba(34,211,238,0.22)', color: '#67E8F9' }}>
-                    {project.tag}
-                  </span>
-                  <h3 className="text-base font-bold text-white mb-2 group-hover:text-violet-300 transition-colors">
-                    {project.title}
-                  </h3>
-                  <p className="text-xs leading-relaxed mb-4 flex-1" style={{ color: 'var(--color-text-3)' }}>
-                    {project.description}
-                  </p>
-                  <div className="flex flex-wrap gap-1.5 mb-4">
-                    {project.tech.slice(0, 3).map((t, j) => <span key={j} className="tech-chip">{t}</span>)}
-                  </div>
-                  <div className="flex items-center gap-3 mt-auto">
-                    <a
-                      href={project.github}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={(e) => e.stopPropagation()}
-                      className="flex items-center gap-1.5 text-xs font-bold transition-colors"
-                      style={{ color: 'var(--color-text-3)' }}
-                    >
-                      <FaGithub size={12} /> GitHub
-                    </a>
-                    <button className="flex items-center gap-1.5 text-xs font-bold ml-auto group/btn"
-                      style={{ color: 'var(--accent-cyan)' }}>
-                      {detailsLabel} <FaArrowRight size={10} className="group-hover/btn:translate-x-1 transition-transform" />
-                    </button>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-
-        {/* View all button */}
-        <div className="text-center">
-          <Link to="/todos-projetos">
-            <motion.button
-              whileHover={{ scale: 1.04 }}
-              whileTap={{ scale: 0.96 }}
-              className="px-10 py-4 rounded-full font-bold text-sm transition-all duration-300"
-              style={{
-                background: 'transparent',
-                border: '1px solid rgba(124,58,237,0.4)',
-                color: 'var(--color-text-2)',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(124,58,237,0.12)';
-                e.currentTarget.style.borderColor = 'rgba(124,58,237,0.7)';
-                e.currentTarget.style.color = '#fff';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'transparent';
-                e.currentTarget.style.borderColor = 'rgba(124,58,237,0.4)';
-                e.currentTarget.style.color = 'var(--color-text-2)';
-              }}
-            >
-              {viewAllLabel} →
-            </motion.button>
-          </Link>
-        </div>
+      <div className="border-b border-line">
+        {t.projects.items.filter((p) => p.featured !== false).map((project) => (
+          <ProjectCase key={project.id} project={project} />
+        ))}
       </div>
 
+      <div className="mt-8">
+        <Link to="/projetos" className="link-underline text-sm font-medium">
+          {t.projects.all} →
+        </Link>
+      </div>
     </section>
   );
-};
-
-export default Projects;
+}

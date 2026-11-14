@@ -1,108 +1,65 @@
-import { useState, lazy, Suspense } from "react";
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { useEffect } from "react";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import { ReactLenis } from "@studio-freight/react-lenis";
 
+import { LanguageProvider } from "./context/LanguageContext";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
-import About from "./components/About";
 import Projects from "./components/Projects";
 import Experience from "./components/Experience";
-import Music from "./components/Music";
-import Books from "./components/Books";
+import About from "./components/About";
 import Contact from "./components/Contact";
 import Footer from "./components/Footer";
 import AllProjects from "./components/AllProjects";
+import Radar from "./components/Radar";
+import Books from "./components/Books";
 import AllBooks from "./components/AllBooks";
-import ProjectDetail from "./components/ProjectDetail";
-import WelcomePage from "./components/WelcomePage";
-import "./App.css";
 
-const Background = lazy(() => import("./components/Background"));
+const lenisOptions = { duration: 1.1, lerp: 0.1, smoothWheel: true };
 
-// ─── Inner layout (needs Router context for useLocation) ──────────────────────
-function AppInner({ language, toggleLanguage }) {
-  const location = useLocation();
-  const isWelcome = location.pathname === "/";
-
+function Home() {
   return (
-    <div className="relative font-sans min-h-screen selection:bg-neon-cyan/30 selection:text-white text-slate-200 bg-black">
-
-      {/* Aurora background — always visible */}
-      <div className="fixed inset-0 z-0 pointer-events-none">
-        <Suspense fallback={<div className="bg-black w-full h-full" />}>
-          <Background />
-        </Suspense>
-      </div>
-
-      <div className="relative z-10 flex flex-col min-h-screen">
-        {/* Navbar hidden on welcome page */}
-        {!isWelcome && (
-          <Navbar language={language} toggleLanguage={toggleLanguage} />
-        )}
-
-        <main className="flex-grow">
-          <Routes>
-            {/* ── Welcome ── */}
-            <Route path="/" element={<WelcomePage language={language} />} />
-
-            {/* ── Home (full portfolio) ── */}
-            <Route
-              path="/home"
-              element={
-                <>
-                  <Hero language={language} />
-                  <div className="h-16 md:h-20" />
-                  <About language={language} />
-                  <Projects language={language} />
-                  <Experience language={language} />
-                  <Music language={language} />
-                  <Books language={language} />
-                  <Contact language={language} />
-                </>
-              }
-            />
-
-            {/* ── Gallery ── */}
-            <Route path="/todos-projetos" element={<AllProjects language={language} />} />
-
-            {/* ── Bookshelf ── */}
-            <Route path="/livros" element={<AllBooks language={language} />} />
-
-            {/* ── Project dashboard ── */}
-            <Route path="/projetos/:id" element={<ProjectDetail language={language} />} />
-          </Routes>
-        </main>
-
-        {/* Footer hidden on welcome page */}
-        {!isWelcome && <Footer />}
-      </div>
-
-    </div>
+    <>
+      <Hero />
+      <Projects />
+      <Experience />
+      <About />
+      <Books />
+      <Contact />
+    </>
   );
 }
 
-// ─── Root ─────────────────────────────────────────────────────────────────────
-function App() {
-  const [language, setLanguage] = useState("pt");
-
-  const toggleLanguage = () =>
-    setLanguage((prev) => (prev === "pt" ? "en" : "pt"));
-
-  const lenisOptions = {
-    duration: 1.2,
-    lerp: 0.1,
-    wheelMultiplier: 1,
-    smoothWheel: true,
-    syncTouch: true,
-  };
-
-  return (
-    <ReactLenis root options={lenisOptions}>
-      <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-        <AppInner language={language} toggleLanguage={toggleLanguage} />
-      </Router>
-    </ReactLenis>
-  );
+// Ao trocar de página (sem âncora) volta ao topo.
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
 }
 
-export default App;
+export default function App() {
+  return (
+    <LanguageProvider>
+      <ReactLenis root options={lenisOptions}>
+        <BrowserRouter>
+          <ScrollToTop />
+          <div className="flex min-h-screen flex-col">
+            <Navbar />
+            <main className="flex-1">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/projetos" element={<AllProjects />} />
+                <Route path="/todos-projetos" element={<AllProjects />} />
+                <Route path="/radar" element={<Radar />} />
+                <Route path="/livros" element={<AllBooks />} />
+              </Routes>
+            </main>
+            <Footer />
+          </div>
+        </BrowserRouter>
+      </ReactLenis>
+    </LanguageProvider>
+  );
+}

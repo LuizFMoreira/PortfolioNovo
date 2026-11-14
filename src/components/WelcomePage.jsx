@@ -174,7 +174,7 @@ const WelcomePage = ({ language }) => {
           className="mt-8 text-[10px] font-mono tracking-[0.28em] uppercase"
           style={{ color: 'var(--color-text-3)' }}
         >
-          4º período &nbsp;·&nbsp; PUC Minas &nbsp;·&nbsp; {new Date().getFullYear()}
+          5º período &nbsp;·&nbsp; PUC Minas &nbsp;·&nbsp; {new Date().getFullYear()}
         </motion.p>
       </div>
 
