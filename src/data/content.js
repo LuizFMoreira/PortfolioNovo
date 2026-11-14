@@ -123,7 +123,7 @@ const experience = [
       en: "Software development in a team.",
     },
     points: { pt: [], en: [] },
-    stack: ["Flutter", "Dart", "Supabase", "NestJS", "Resend", "Grafana"],
+    stack: ["Flutter", "Dart", "Supabase"],
   },
   {
     id: "lim",
@@ -217,11 +217,10 @@ export const content = {
         "O rigor analítico e matemático, que aplico diariamente em Cálculo e Algoritmos, é fundamental para criar sistemas limpos e manuteníveis.",
       stackTitle: "Ferramentas",
       stack: [
-        ["Back-end", "Java, Spring Boot, NestJS, Node.js, Python, Flask"],
+        ["Back-end", "Java, Spring Boot, Node.js, Python, Flask"],
         ["Front-end", "React, TypeScript, Next.js, Tailwind"],
         ["Mobile", "Flutter, Dart"],
         ["Dados e infra", "MySQL, PostgreSQL, Supabase, Docker"],
-        ["Observabilidade e e-mail", "Grafana, Resend"],
       ],
     },
     contact: {
@@ -304,11 +303,10 @@ export const content = {
         "Analytical and mathematical rigor, which I apply daily in Calculus and Algorithms, is fundamental to building clean, maintainable systems.",
       stackTitle: "Tools",
       stack: [
-        ["Back-end", "Java, Spring Boot, NestJS, Node.js, Python, Flask"],
+        ["Back-end", "Java, Spring Boot, Node.js, Python, Flask"],
         ["Front-end", "React, TypeScript, Next.js, Tailwind"],
         ["Mobile", "Flutter, Dart"],
         ["Data and infra", "MySQL, PostgreSQL, Supabase, Docker"],
-        ["Observability and email", "Grafana, Resend"],
       ],
     },
     contact: {
