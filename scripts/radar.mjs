@@ -121,16 +121,32 @@ async function summarize(items) {
     JSON.stringify(payload);
   try {
     // Gemini pelo endpoint compatível com OpenAI (mesmo padrão do mirofish-teste).
-    const res = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
-      method: "POST",
-      headers: { Authorization: "Bearer " + key, "content-type": "application/json" },
-      body: JSON.stringify({
-        model: process.env.RADAR_MODEL || "gemini-2.5-flash",
-        temperature: 0.2,
-        messages: [{ role: "user", content: prompt }],
-      }),
-      signal: AbortSignal.timeout(90000),
-    });
+    // Tenta de novo (com espera) quando a API está sobrecarregada (429/500/503).
+    // Modelos em ordem de preferência; se um estiver ocupado ou indisponível, tenta o próximo.
+    const models = process.env.RADAR_MODEL
+      ? [process.env.RADAR_MODEL]
+      : ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.5-flash"];
+    let res;
+    outer: for (const model of models) {
+      for (let attempt = 1; attempt <= 2; attempt++) {
+        try {
+          res = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
+            method: "POST",
+            headers: { Authorization: "Bearer " + key, "content-type": "application/json" },
+            body: JSON.stringify({ model, temperature: 0.2, messages: [{ role: "user", content: prompt }] }),
+            signal: AbortSignal.timeout(60000),
+          });
+        } catch (e) {
+          console.warn("Gemini " + model + ": " + e.name);
+          break;
+        }
+        if (res.ok) break outer;
+        console.warn("Gemini " + model + " respondeu " + res.status + (attempt < 2 ? ", nova tentativa em 10s…" : ""));
+        if (![429, 500, 503].includes(res.status)) break;
+        if (attempt < 2) await new Promise((r) => setTimeout(r, 10000));
+      }
+    }
+    if (!res) throw new Error("nenhum modelo respondeu");
     if (!res.ok) throw new Error("API " + res.status + " " + (await res.text()).slice(0, 300));
     const text = (await res.json()).choices?.[0]?.message?.content || "";
     const arr = JSON.parse(text.slice(text.indexOf("["), text.lastIndexOf("]") + 1));
