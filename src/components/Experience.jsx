@@ -31,7 +31,7 @@ export default function Experience() {
                       </li>
                     ))}
                   </ul>
-                  <p className="mt-5 font-mono text-xs text-mute">{item.stack.join(" / ")}</p>
+                  <p className="mt-5 font-mono text-xs text-mute">{(Array.isArray(item.stack) ? item.stack : item.stack[language]).join(" / ")}</p>
                 </div>
               </div>
             </Reveal>

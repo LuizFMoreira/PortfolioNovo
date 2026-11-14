@@ -24,6 +24,8 @@ export function LanguageProvider({ children }) {
 
   useEffect(() => {
     document.documentElement.lang = language === "pt" ? "pt-BR" : "en";
+    document.title = content[language].meta.title;
+    document.querySelector('meta[name="description"]')?.setAttribute("content", content[language].meta.description);
     try {
       localStorage.setItem(STORAGE_KEY, language);
     } catch {

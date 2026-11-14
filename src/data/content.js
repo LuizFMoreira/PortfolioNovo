@@ -169,13 +169,21 @@ const experience = [
         "Resolved conflicts and prioritized the highest-impact features.",
       ],
     },
-    stack: ["Metodologias ágeis", "Figma", "MVP"],
+    stack: {
+      pt: ["Metodologias ágeis", "Figma", "MVP"],
+      en: ["Agile methodologies", "Figma", "MVP"],
+    },
   },
 ];
 
 export const content = {
   pt: {
-    meta: { langName: "Português", switchTo: "EN" },
+    meta: {
+      langName: "Português",
+      switchTo: "EN",
+      title: "Luiz Fernando Moreira — Engenheiro de Software",
+      description: "Luiz Fernando Moreira — Engenheiro de Software e Full Stack. Java, Spring Boot, React e TypeScript.",
+    },
     nav: {
       links: [
         { label: "Projetos", href: "#projetos" },
@@ -187,6 +195,9 @@ export const content = {
       ],
       resume: "Currículo",
       home: "Início",
+      aria: "Principal",
+      ariaMobile: "Principal (celular)",
+      image: "Imagem",
     },
     hero: {
       status: "Disponível para novos projetos",
@@ -262,7 +273,12 @@ export const content = {
     },
   },
   en: {
-    meta: { langName: "English", switchTo: "PT" },
+    meta: {
+      langName: "English",
+      switchTo: "PT",
+      title: "Luiz Fernando Moreira — Software Engineer",
+      description: "Luiz Fernando Moreira — Software Engineer and Full Stack developer. Java, Spring Boot, React and TypeScript.",
+    },
     nav: {
       links: [
         { label: "Projects", href: "#projetos" },
@@ -274,6 +290,9 @@ export const content = {
       ],
       resume: "Resume",
       home: "Home",
+      aria: "Main",
+      ariaMobile: "Main (mobile)",
+      image: "Image",
     },
     hero: {
       status: "Available for new projects",

@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { useLanguage } from "../context/LanguageContext";
 
 export default function ImageCarousel({ images, alt }) {
+  const { t } = useLanguage();
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const [broken, setBroken] = useState({});
@@ -45,7 +47,7 @@ export default function ImageCarousel({ images, alt }) {
             <button
               key={i}
               type="button"
-              aria-label={`Imagem ${i + 1}`}
+              aria-label={`${t.nav.image} ${i + 1}`}
               aria-current={i === index}
               onClick={() => setIndex(i)}
               className={`h-1 flex-1 transition-colors ${i === index ? "bg-paper" : "bg-paper/40 hover:bg-paper/70"}`}

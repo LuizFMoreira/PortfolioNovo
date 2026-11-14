@@ -31,7 +31,7 @@ export default function Navbar() {
           Luiz Moreira<span className="text-accent">.</span>
         </Link>
 
-        <nav aria-label="Principal" className="hidden items-center gap-7 text-sm md:flex">
+        <nav aria-label={t.nav.aria} className="hidden items-center gap-7 text-sm md:flex">
           {t.nav.links.map((l) => (
             <a key={l.href} href={l.href} onClick={(e) => goTo(e, l.href)} className="text-mute transition-colors hover:text-ink">
               {l.label}
@@ -55,7 +55,7 @@ export default function Navbar() {
       </div>
 
       {/* Links em linha rolável no celular */}
-      <nav aria-label="Principal (mobile)" className="container-page flex gap-6 overflow-x-auto pb-3 text-sm md:hidden">
+      <nav aria-label={t.nav.ariaMobile} className="container-page flex gap-6 overflow-x-auto pb-3 text-sm md:hidden">
         {t.nav.links.map((l) => (
           <a key={l.href} href={l.href} onClick={(e) => goTo(e, l.href)} className="shrink-0 text-mute">
             {l.label}
