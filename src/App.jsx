@@ -12,6 +12,8 @@ import Contact from "./components/Contact";
 import Footer from "./components/Footer";
 import AllProjects from "./components/AllProjects";
 import Radar from "./components/Radar";
+import Books from "./components/Books";
+import AllBooks from "./components/AllBooks";
 
 const lenisOptions = { duration: 1.1, lerp: 0.1, smoothWheel: true };
 
@@ -22,6 +24,7 @@ function Home() {
       <Projects />
       <Experience />
       <About />
+      <Books />
       <Contact />
     </>
   );
@@ -50,6 +53,7 @@ export default function App() {
                 <Route path="/projetos" element={<AllProjects />} />
                 <Route path="/todos-projetos" element={<AllProjects />} />
                 <Route path="/radar" element={<Radar />} />
+                <Route path="/livros" element={<AllBooks />} />
               </Routes>
             </main>
             <Footer />
