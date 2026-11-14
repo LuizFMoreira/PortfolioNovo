@@ -5,14 +5,25 @@
 // da versão anterior. Troque pelos endereços reais antes de publicar.
 export const links = {
   github: "https://github.com/LuizFMoreira",
-  linkedin: "https://linkedin.com/in/seu-linkedin", // TODO
-  whatsapp: "https://wa.me/5531999999999", // TODO
-  email: "mailto:contato@luizfernando.dev", // TODO
+  linkedin: "https://www.linkedin.com/in/luiz-fernando-batista-moreira-987834218/",
+  whatsapp: "https://wa.me/5533998069662",
+  email: "mailto:bluizfernando720@gmail.com",
   resume: "/curriculo.pdf",
   resumeFileName: "LuizFernando_BatistaMoreira_Currículo.pdf",
 };
 
 const projects = [
+  {
+    id: "homefix",
+    title: { pt: "HomeFix", en: "HomeFix" },
+    kind: { pt: "Gestão de reparos em condomínios", en: "Condo repair management" },
+    description: {
+      pt: "Plataforma que conecta moradores, prestadores de serviço e síndicos: chamados, orçamentos, agendamentos e transparência financeira. Trabalho interdisciplinar em equipe; atuo no front-end web em React, nos protótipos e no planejamento das sprints.",
+      en: "Platform connecting residents, service providers and building managers: requests, quotes, scheduling and financial transparency. Team capstone project; I work on the React web front-end, prototypes and sprint planning.",
+    },
+    tech: ["React", "TypeScript", "Java", "Spring Boot", "PostgreSQL", "Flutter"],
+    private: true,
+  },
   {
     id: "reuse",
     title: { pt: "Re.use", en: "Re.use" },
@@ -56,6 +67,7 @@ const projects = [
   },
   {
     id: "detalhes-em-prata",
+    featured: false,
     title: { pt: "Detalhes em Prata", en: "Detalhes em Prata" },
     kind: { pt: "E-commerce de joias", en: "Jewelry e-commerce" },
     description: {
@@ -74,9 +86,45 @@ const projects = [
       en: "Detalhes em Prata store interface",
     },
   },
+  {
+    id: "divideconta",
+    featured: false,
+    title: { pt: "DivideConta", en: "DivideConta" },
+    kind: { pt: "App mobile", en: "Mobile app" },
+    description: {
+      pt: "App em Flutter para dividir a conta do bar: valor total, número de pessoas e gorjeta viram um recibo com a parte de cada um, atualizado enquanto você digita.",
+      en: "Flutter app to split a bar tab: total, headcount and tip become a receipt with each person's share, updated as you type.",
+    },
+    tech: ["Flutter", "Dart"],
+    github: "https://github.com/LuizFMoreira/DivideConta_",
+  },
+  {
+    id: "rastro",
+    featured: false,
+    title: { pt: "Rastro", en: "Rastro" },
+    kind: { pt: "Proposta de aplicativo", en: "App proposal" },
+    description: {
+      pt: "Proposta de app de alerta comunitário para pets perdidos: avisos por proximidade, avistamentos com foto e localização, e funcionamento offline. Trabalho de Aplicações Móveis, com proposta de Flutter e Supabase.",
+      en: "Proposal for a community alert app for lost pets: proximity notifications, sightings with photo and location, and offline use. Mobile Applications coursework, proposing Flutter and Supabase.",
+    },
+    tech: ["Flutter", "Supabase", "UX"],
+    private: true,
+  },
 ];
 
 const experience = [
+  {
+    id: "groohub",
+    period: { pt: "2026 — Presente", en: "2026 — Present" },
+    role: { pt: "Estagiário de desenvolvimento", en: "Development intern" },
+    org: { pt: "Groohub", en: "Groohub" },
+    description: {
+      pt: "Desenvolvimento de software em equipe.",
+      en: "Software development in a team.",
+    },
+    points: { pt: [], en: [] },
+    stack: ["Flutter", "Dart", "Supabase"],
+  },
   {
     id: "lim",
     period: { pt: "Out. 2025 — Presente", en: "Oct. 2025 — Present" },
@@ -144,7 +192,7 @@ export const content = {
       headline: ["Software com", "rigor", "e bom gosto."],
       description:
         "Estudante de Engenharia de Software na PUC Minas. Projeto arquiteturas em Java e Spring Boot e construo interfaces em React e TypeScript.",
-      meta: ["PUC Minas · 4º período", "Laboratório LIM · 2025 — hoje"],
+      meta: ["PUC Minas · 5º período", "Groohub · estágio · 2026 — hoje"],
       ctaProjects: "Ver projetos",
       ctaContact: "Iniciar conversa",
     },
@@ -152,6 +200,7 @@ export const content = {
       title: "Projetos",
       intro: "Trabalhos acadêmicos e de extensão, do banco de dados à interface.",
       code: "Código no GitHub",
+      privateRepo: "Repositório privado",
       all: "Ver arquivo completo",
       items: projects,
     },
@@ -162,7 +211,7 @@ export const content = {
     },
     about: {
       title: "Sobre",
-      lead: "Sou estudante do 4º período de Engenharia de Software na PUC Minas e desenvolvedor Full Stack.",
+      lead: "Sou estudante do 5º período de Engenharia de Software na PUC Minas e desenvolvedor Full Stack.",
       body: "Minha trajetória é focada em projetar arquiteturas eficientes e construir soluções escaláveis de ponta a ponta. Tecnicamente, atuo com domínio do ecossistema Java e Spring Boot no back-end, integrando bancos de dados relacionais com interfaces modernas, tipadas e reativas em React, TypeScript e Next.js.",
       quote:
         "O rigor analítico e matemático, que aplico diariamente em Cálculo e Algoritmos, é fundamental para criar sistemas limpos e manuteníveis.",
@@ -170,7 +219,8 @@ export const content = {
       stack: [
         ["Back-end", "Java, Spring Boot, Node.js, Python, Flask"],
         ["Front-end", "React, TypeScript, Next.js, Tailwind"],
-        ["Dados e infra", "MySQL, PostgreSQL, Docker"],
+        ["Mobile", "Flutter, Dart"],
+        ["Dados e infra", "MySQL, PostgreSQL, Supabase, Docker"],
       ],
     },
     contact: {
@@ -228,7 +278,7 @@ export const content = {
       headline: ["Software built", "with rigor", "and taste."],
       description:
         "Software Engineering student at PUC Minas. I design architectures in Java and Spring Boot and build interfaces in React and TypeScript.",
-      meta: ["PUC Minas · 4th term", "LIM Laboratory · 2025 — now"],
+      meta: ["PUC Minas · 5th term", "Groohub · internship · 2026 — now"],
       ctaProjects: "See projects",
       ctaContact: "Start a conversation",
     },
@@ -236,6 +286,7 @@ export const content = {
       title: "Projects",
       intro: "Academic and outreach work, from the database to the interface.",
       code: "Code on GitHub",
+      privateRepo: "Private repository",
       all: "See full archive",
       items: projects,
     },
@@ -246,7 +297,7 @@ export const content = {
     },
     about: {
       title: "About",
-      lead: "I am a 4th-term Software Engineering student at PUC Minas and a Full Stack developer.",
+      lead: "I am a 5th-term Software Engineering student at PUC Minas and a Full Stack developer.",
       body: "My focus is designing efficient architectures and building scalable end-to-end solutions. On the back-end I work with the Java and Spring Boot ecosystem, integrating relational databases with modern, typed and reactive interfaces in React, TypeScript and Next.js.",
       quote:
         "Analytical and mathematical rigor, which I apply daily in Calculus and Algorithms, is fundamental to building clean, maintainable systems.",
@@ -254,7 +305,8 @@ export const content = {
       stack: [
         ["Back-end", "Java, Spring Boot, Node.js, Python, Flask"],
         ["Front-end", "React, TypeScript, Next.js, Tailwind"],
-        ["Data and infra", "MySQL, PostgreSQL, Docker"],
+        ["Mobile", "Flutter, Dart"],
+        ["Data and infra", "MySQL, PostgreSQL, Supabase, Docker"],
       ],
     },
     contact: {

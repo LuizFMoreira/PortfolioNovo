@@ -11,7 +11,7 @@ export default function Projects() {
       <SectionHeader id="projetos-titulo" title={t.projects.title} intro={t.projects.intro} />
 
       <div className="border-b border-line">
-        {t.projects.items.map((project) => (
+        {t.projects.items.filter((p) => p.featured !== false).map((project) => (
           <ProjectCase key={project.id} project={project} />
         ))}
       </div>
