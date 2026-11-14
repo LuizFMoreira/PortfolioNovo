@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-14T21:31:13.173Z",
+  "updatedAt": "2026-11-14T21:54:34.477Z",
   "items": [
     {
       "id": "c479f2841d4a",
@@ -203,7 +203,7 @@
       "source": "CISA KEV",
       "type": "oficial",
       "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-114713",
-      "title": "CVE-2026-114713: UnrealIRCd UnrealIRCd",
+      "title": "CVE-2026-114713: UnrealIRCd",
       "date": "2026-11-13T00:00:00.000Z",
       "excerpt": "UnrealIRCd Improper Neutralization of Delimiters Vulnerability. UnrealIRCd UnrealIRCd contains an improper neutralization of delimiters vulnerability that allows any user on a network with two or more linked servers to inject server-to-server commands that are executed with server authority.",
       "score": 0,

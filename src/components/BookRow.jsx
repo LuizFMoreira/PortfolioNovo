@@ -7,9 +7,14 @@ export const STATUS = {
 };
 
 // Capa pequena (Open Library). Se não existir, a linha continua só com texto.
-function Cover({ isbn }) {
+function Cover({ isbn, title }) {
   const [failed, setFailed] = useState(false);
-  if (failed) return <div aria-hidden className="h-24 w-16 border border-line" />;
+  if (failed)
+    return (
+      <div aria-hidden className="flex h-24 w-16 items-center justify-center border border-line font-display text-4xl italic text-accent/80">
+        {title.trim().charAt(0)}
+      </div>
+    );
   return (
     <img
       src={getBookCover(isbn, "M")}
@@ -27,7 +32,7 @@ function Cover({ isbn }) {
 export default function BookRow({ book, language }) {
   return (
     <li className="grid grid-cols-[4rem_1fr] gap-5 border-t border-line py-6 first:border-t-0">
-      <Cover isbn={book.isbn} />
+      <Cover isbn={book.isbn} title={book.title} />
       <div>
         <p className="eyebrow flex flex-wrap gap-x-3">
           <span className={book.status === "reading" ? "text-accent" : ""}>{STATUS[language][book.status]}</span>

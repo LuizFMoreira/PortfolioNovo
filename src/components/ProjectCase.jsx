@@ -9,7 +9,7 @@ export default function ProjectCase({ project }) {
   return (
     <Reveal>
       <article className="grid gap-6 border-t border-line py-10 md:grid-cols-12 md:gap-10">
-        <div className={`flex flex-col justify-between gap-6 ${hasImages ? "md:col-span-5" : "md:col-span-8"}`}>
+        <div className="flex flex-col justify-between gap-6 md:col-span-5">
           <div>
             <p className="eyebrow mb-3">{project.kind[language]}</p>
             <h3 className="font-display text-4xl leading-none tracking-tight sm:text-5xl">
@@ -43,11 +43,20 @@ export default function ProjectCase({ project }) {
           </div>
         </div>
 
-        {hasImages && (
-          <div className="md:col-span-7">
+        <div className="md:col-span-7">
+          {hasImages ? (
             <ImageCarousel images={project.images} alt={project.alt[language]} />
-          </div>
-        )}
+          ) : (
+            <div
+              aria-hidden
+              className="flex aspect-[16/10] items-center border border-line p-6 sm:p-8"
+            >
+              <p className="font-display text-6xl italic leading-none tracking-tight text-accent/80 sm:text-8xl">
+                {project.title[language]}
+              </p>
+            </div>
+          )}
+        </div>
       </article>
     </Reveal>
   );

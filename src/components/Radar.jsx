@@ -39,7 +39,9 @@ const fmt = (iso, locale) =>
 
 function Item({ it, c, pt }) {
   const title = pt && it.titlePt ? it.titlePt : it.title;
-  const text = pt && it.summaryPt ? it.summaryPt : it.excerpt;
+  const norm = (s) => (s || "").toLowerCase().replace(/[^a-z0-9à-ú]+/g, " ").trim();
+  const raw = pt && it.summaryPt ? it.summaryPt : it.excerpt;
+  const text = norm(raw) === norm(title) ? "" : raw;
   return (
     <li className="border-t border-line py-5 first:border-t-0">
       <p className="eyebrow flex flex-wrap gap-x-3">

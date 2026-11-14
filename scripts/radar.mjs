@@ -102,7 +102,7 @@ const collectors = {
       .sort((a, b) => b.dateAdded.localeCompare(a.dateAdded))
       .slice(0, 12)
       .map((v) => ({
-        title: v.cveID + ": " + v.vendorProject + " " + v.product,
+        title: v.cveID + ": " + (v.vendorProject.toLowerCase() === v.product.toLowerCase() ? v.product : v.vendorProject + " " + v.product),
         url: "https://nvd.nist.gov/vuln/detail/" + v.cveID,
         date: new Date(v.dateAdded),
         excerpt: v.vulnerabilityName + ". " + v.shortDescription,
