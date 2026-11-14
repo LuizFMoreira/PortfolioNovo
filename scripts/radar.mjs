@@ -3,6 +3,18 @@
 import { writeFile, readFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 
+// Chave local opcional: crie .env.local com GEMINI_API_KEY=... (o arquivo é ignorado pelo Git).
+try {
+  const text = await readFile(new URL("../.env.local", import.meta.url), "utf8");
+  for (const line of text.split("\n")) {
+    const eq = line.indexOf("=");
+    if (eq < 1) continue;
+    const key = line.slice(0, eq).trim();
+    const value = line.slice(eq + 1).trim().replace(/^["']|["']$/g, "");
+    if (/^[A-Z_]+$/.test(key) && value && !process.env[key]) process.env[key] = value;
+  }
+} catch {}
+
 const OUT = new URL("../src/data/radar.json", import.meta.url);
 const UA = "Mozilla/5.0 (compatible; PortfolioRadar/1.0)";
 const PER_SOURCE = 4; // itens por fonte
@@ -119,7 +131,7 @@ async function summarize(items) {
       }),
       signal: AbortSignal.timeout(90000),
     });
-    if (!res.ok) throw new Error("API " + res.status);
+    if (!res.ok) throw new Error("API " + res.status + " " + (await res.text()).slice(0, 300));
     const text = (await res.json()).choices?.[0]?.message?.content || "";
     const arr = JSON.parse(text.slice(text.indexOf("["), text.lastIndexOf("]") + 1));
     for (const r of arr) {

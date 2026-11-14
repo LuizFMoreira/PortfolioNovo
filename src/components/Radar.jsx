@@ -54,6 +54,7 @@ function Item({ it, c, pt }) {
       </h3>
       {text && <p className="mt-2 text-sm text-mute">{text}</p>}
       {pt && it.ai && <p className="mt-2 font-mono text-[11px] uppercase tracking-[0.12em] text-mute">Resumo gerado por IA</p>}
+      {pt && !it.summaryPt && <p className="mt-2 font-mono text-[11px] uppercase tracking-[0.12em] text-mute">Original em inglês</p>}
     </li>
   );
 }
