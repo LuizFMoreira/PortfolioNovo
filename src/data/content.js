@@ -23,6 +23,15 @@ const projects = [
     },
     tech: ["React", "TypeScript", "Java", "Spring Boot", "PostgreSQL", "Flutter"],
     private: true,
+    images: [
+      "/img/homefix/painel-chamados.jpg",
+      "/img/homefix/dashboard-financeiro.jpg",
+      "/img/homefix/usuarios-prestadores.jpg",
+    ],
+    alt: {
+      pt: "Telas do protótipo do HomeFix: painel de chamados, dashboard financeiro e gestão de usuários",
+      en: "HomeFix prototype screens: requests panel, financial dashboard and user management",
+    },
   },
   {
     id: "reuse",
