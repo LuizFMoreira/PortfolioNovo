@@ -1,18 +1,26 @@
-const Footer = () => {
-  const currentYear = new Date().getFullYear();
+import { useLanguage } from "../context/LanguageContext";
+import { useNowPlaying } from "../hooks/useNowPlaying";
+
+export default function Footer() {
+  const { t } = useLanguage();
+  const song = useNowPlaying();
 
   return (
-    <footer className="relative z-10 bg-black/60 backdrop-blur-md py-8 text-center border-t border-white/10">
-      <div className="max-w-4xl mx-auto px-6">
-        <p className="text-slate-300 font-medium mb-2 tracking-wide text-sm">
-          &copy; {currentYear} Luiz Fernando Batista Moreira.
+    <footer className="border-t border-ink">
+      <div className="container-page flex flex-col gap-4 py-8 text-sm text-mute md:flex-row md:items-center md:justify-between">
+        <p>
+          © {new Date().getFullYear()} {t.footer.rights}. {t.footer.built}
         </p>
-        <p className="text-slate-500 text-xs tracking-widest uppercase">
-          Desenvolvido com React, Vite e precisão algorítmica.
-        </p>
+
+        {song && (
+          <p className="font-mono text-xs">
+            <span className="text-accent">●</span> {t.footer.nowPlaying}:{" "}
+            <a href={song.songUrl} target="_blank" rel="noopener noreferrer" className="link-underline text-ink">
+              {song.title} — {song.artist}
+            </a>
+          </p>
+        )}
       </div>
     </footer>
   );
-};
-
-export default Footer;
+}

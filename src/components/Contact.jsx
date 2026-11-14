@@ -1,217 +1,150 @@
-import { useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { useId, useRef, useState } from "react";
 import emailjs from "@emailjs/browser";
-import { FaEnvelope, FaWhatsapp, FaLinkedin, FaGithub } from "react-icons/fa";
-import { FaExclamationCircle, FaCheckCircle, FaSpinner } from "react-icons/fa";
+import { useLanguage } from "../context/LanguageContext";
+import Reveal from "./Reveal";
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 32 },
-  show:   { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } },
-};
-const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.1 } } };
-
-const inputBase = "w-full rounded-xl p-4 text-white placeholder-slate-600 focus:outline-none transition-all text-sm";
-const inputStyle = {
-  background: 'rgba(255,255,255,0.04)',
-  border: '1px solid rgba(255,255,255,0.08)',
-};
-const inputFocus = {
-  borderColor: 'rgba(124,58,237,0.6)',
-  background: 'rgba(124,58,237,0.06)',
-  boxShadow: '0 0 20px rgba(124,58,237,0.15)',
+// Chaves públicas do EmailJS (podem ficar no front-end por desenho do serviço).
+const EMAILJS = {
+  service: "service_wo4vk2b",
+  template: "template_22mzy1l",
+  publicKey: "wx5kVH1zKLNd5FhEP",
 };
 
-const Contact = ({ language }) => {
-  const form   = useRef();
-  const [status, setStatus]   = useState("");
-  const [errors, setErrors]   = useState({});
-  const [focused, setFocused] = useState({});
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  const content = {
-    pt: {
-      tagline: "Vamos conversar",
-      title: "Transforme sua ideia em realidade digital.",
-      description: "Estou disponível para projetos freelance, colaborações ou oportunidades de carreira. Envie uma mensagem e vamos discutir como posso agregar valor ao seu time.",
-      nameLabel: "Seu Nome", emailLabel: "Seu E-mail", messageLabel: "Sua Mensagem",
-      buttonText: "Enviar Mensagem", loadingText: "Enviando...",
-      successMsg: "Mensagem enviada com sucesso!", errorMsg: "Erro ao enviar. Tente novamente.",
-    },
-    en: {
-      tagline: "Let's connect",
-      title: "Turn your idea into digital reality.",
-      description: "I am available for freelance projects, collaborations, or career opportunities. Send a message and let's discuss how I can add value to your team.",
-      nameLabel: "Your Name", emailLabel: "Your Email", messageLabel: "Your Message",
-      buttonText: "Send Message", loadingText: "Sending...",
-      successMsg: "Message sent successfully!", errorMsg: "Error sending. Please try again.",
-    },
-  };
-  const text = content[language];
+function Field({ id, label, error, children }) {
+  return (
+    <div>
+      <label htmlFor={id} className="eyebrow mb-2 block">
+        {label}
+      </label>
+      {children}
+      {error && (
+        <p id={`${id}-erro`} role="alert" className="mt-1.5 text-sm text-[#b3261e]">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
 
-  const validateForm = () => {
-    const name    = form.current.user_name.value;
-    const email   = form.current.user_email.value;
-    const message = form.current.message.value;
-    const newErrors = {};
-    if (!name.trim())    newErrors.user_name  = true;
-    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) newErrors.user_email = true;
-    if (!message.trim()) newErrors.message    = true;
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+const inputClass =
+  "w-full border-0 border-b bg-transparent py-2 text-base placeholder:text-mute/60 focus:border-accent focus:outline-none focus:ring-0 transition-colors";
+
+export default function Contact() {
+  const { t } = useLanguage();
+  const form = useRef(null);
+  const uid = useId();
+  const [status, setStatus] = useState("idle"); // idle | sending | success | error
+  const [errors, setErrors] = useState({});
+
+  const validate = (data) => {
+    const next = {};
+    if (!data.user_name.trim()) next.user_name = t.contact.errors.name;
+    if (!EMAIL_RE.test(data.user_email.trim())) next.user_email = t.contact.errors.email;
+    if (!data.message.trim()) next.message = t.contact.errors.message;
+    return next;
   };
 
-  const sendEmail = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
-    if (!validateForm()) return;
-    setStatus("loading");
-    emailjs.sendForm("service_wo4vk2b", "template_22mzy1l", form.current, "wx5kVH1zKLNd5FhEP")
-      .then(() => { setStatus("success"); e.target.reset(); }, () => setStatus("error"));
+    const fd = new FormData(form.current);
+    const data = {
+      user_name: fd.get("user_name") ?? "",
+      user_email: fd.get("user_email") ?? "",
+      message: fd.get("message") ?? "",
+    };
+    const found = validate(data);
+    setErrors(found);
+    if (Object.keys(found).length) return;
+
+    setStatus("sending");
+    try {
+      await emailjs.sendForm(EMAILJS.service, EMAILJS.template, form.current, EMAILJS.publicKey);
+      setStatus("success");
+      form.current.reset();
+    } catch {
+      setStatus("error");
+    }
   };
 
-  const socialLinks = [
-    { icon: FaLinkedin,  href: "https://www.linkedin.com/in/luiz-fernando-batista-moreira-987834218/", label: "LinkedIn"  },
-    { icon: FaGithub,    href: "https://github.com/LuizFMoreira",                                      label: "GitHub"    },
-    { icon: FaWhatsapp,  href: "https://wa.me/5531999999999",                                          label: "WhatsApp"  },
-    { icon: FaEnvelope,  href: "mailto:bluizfernando720@gmail.com",                                    label: "Email"     },
-  ];
-
-  const getFieldStyle = (name) => ({
-    ...inputStyle,
-    ...(focused[name] ? inputFocus : {}),
-    ...(errors[name]  ? { borderColor: 'rgba(239,68,68,0.6)' } : {}),
-  });
+  const border = (key) => (errors[key] ? "border-[#b3261e]" : "border-ink/40");
+  const ids = { name: `${uid}-name`, email: `${uid}-email`, message: `${uid}-message` };
 
   return (
-    <section id="contato" className="py-28 px-6 relative z-10 overflow-hidden">
-      <div className="max-w-6xl mx-auto">
+    <section id="contato" aria-labelledby="contato-titulo" className="container-page py-20 md:py-28">
+      <div className="grid gap-12 border-t border-ink pt-6 md:grid-cols-12 md:gap-10">
+        <Reveal className="md:col-span-5">
+          <h2 id="contato-titulo" className="font-display text-5xl leading-none tracking-tight sm:text-6xl">
+            {t.contact.title}
+            <span className="text-accent">.</span>
+          </h2>
+          <p className="mt-6 max-w-[40ch] leading-relaxed text-mute">{t.contact.description}</p>
 
-        <motion.div
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: "-60px" }}
-          variants={stagger}
-          className="grid lg:grid-cols-2 gap-16 items-start"
-        >
-          {/* ── Left: Text + social ── */}
-          <motion.div variants={fadeUp}>
-            <p className="text-[11px] font-mono tracking-[0.35em] uppercase mb-4 flex items-center gap-3"
-              style={{ color: 'var(--accent-violet)' }}>
-              <span className="h-px w-8 flex-shrink-0" style={{ background: 'var(--grad-bar)' }} />
-              {text.tagline}
-            </p>
+          <p className="eyebrow mb-3 mt-10">{t.contact.elsewhere}</p>
+          <ul className="space-y-1.5">
+            {t.contact.channels.map((c) => (
+              <li key={c.label}>
+                <a href={c.href} target="_blank" rel="noopener noreferrer" className="link-underline text-sm font-medium">
+                  {c.label} ↗
+                </a>
+              </li>
+            ))}
+          </ul>
+        </Reveal>
 
-            <h2 className="font-extrabold text-white leading-tight tracking-tight mb-6"
-              style={{ fontSize: 'clamp(2.2rem, 5vw, 4rem)' }}>
-              {text.title}
-            </h2>
+        <Reveal delay={0.1} className="md:col-span-7">
+          <form ref={form} onSubmit={onSubmit} noValidate className="space-y-8">
+            <Field id={ids.name} label={t.contact.name} error={errors.user_name}>
+              <input
+                id={ids.name}
+                name="user_name"
+                type="text"
+                autoComplete="name"
+                aria-invalid={!!errors.user_name}
+                aria-describedby={errors.user_name ? `${ids.name}-erro` : undefined}
+                className={`${inputClass} ${border("user_name")}`}
+              />
+            </Field>
+            <Field id={ids.email} label={t.contact.email} error={errors.user_email}>
+              <input
+                id={ids.email}
+                name="user_email"
+                type="email"
+                autoComplete="email"
+                aria-invalid={!!errors.user_email}
+                aria-describedby={errors.user_email ? `${ids.email}-erro` : undefined}
+                className={`${inputClass} ${border("user_email")}`}
+              />
+            </Field>
+            <Field id={ids.message} label={t.contact.message} error={errors.message}>
+              <textarea
+                id={ids.message}
+                name="message"
+                rows={4}
+                aria-invalid={!!errors.message}
+                aria-describedby={errors.message ? `${ids.message}-erro` : undefined}
+                className={`${inputClass} resize-none ${border("message")}`}
+              />
+            </Field>
 
-            <span className="accent-bar mb-6 block" />
+            <div className="flex flex-wrap items-center gap-5">
+              <button
+                type="submit"
+                disabled={status === "sending"}
+                className="bg-ink px-7 py-3 text-sm font-medium text-paper transition-colors hover:bg-accent disabled:opacity-50"
+              >
+                {status === "sending" ? t.contact.sending : `${t.contact.send} →`}
+              </button>
 
-            <p className="text-base font-light leading-relaxed mb-10 max-w-md" style={{ color: 'var(--color-text-2)' }}>
-              {text.description}
-            </p>
-
-            {/* Social links */}
-            <div className="flex gap-3 flex-wrap">
-              {socialLinks.map((link, i) => (
-                <motion.a
-                  key={i}
-                  href={link.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  whileHover={{ y: -3, scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="w-14 h-14 flex items-center justify-center rounded-2xl text-white transition-colors group"
-                  style={{
-                    background: 'rgba(255,255,255,0.04)',
-                    border: '1px solid rgba(255,255,255,0.08)',
-                    backdropFilter: 'blur(8px)',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = 'rgba(124,58,237,0.15)';
-                    e.currentTarget.style.borderColor = 'rgba(124,58,237,0.5)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
-                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
-                  }}
-                  aria-label={link.label}
-                >
-                  <link.icon size={22} />
-                </motion.a>
-              ))}
+              <p role="status" aria-live="polite" className={`text-sm ${status === "error" ? "text-[#b3261e]" : "text-accent"}`}>
+                {status === "success" && t.contact.success}
+                {status === "error" && t.contact.error}
+              </p>
             </div>
-          </motion.div>
-
-          {/* ── Right: Form ── */}
-          <motion.div variants={fadeUp}>
-            <form
-              ref={form}
-              onSubmit={sendEmail}
-              className="rounded-3xl p-8 md:p-10"
-              style={{
-                background: 'rgba(13,10,30,0.70)',
-                backdropFilter: 'blur(24px)',
-                WebkitBackdropFilter: 'blur(24px)',
-                border: '1px solid rgba(255,255,255,0.07)',
-                boxShadow: 'var(--shadow-card)',
-              }}
-            >
-              <div className="space-y-5">
-                <div>
-                  <label className="block text-xs font-semibold mb-2 uppercase tracking-wider" style={{ color: 'var(--color-text-3)' }}>
-                    {text.nameLabel}
-                  </label>
-                  <input type="text" name="user_name" required className={inputBase} style={getFieldStyle('user_name')}
-                    onFocus={() => setFocused(f => ({ ...f, user_name: true  }))}
-                    onBlur ={() => setFocused(f => ({ ...f, user_name: false }))} />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold mb-2 uppercase tracking-wider" style={{ color: 'var(--color-text-3)' }}>
-                    {text.emailLabel}
-                  </label>
-                  <input type="email" name="user_email" required className={inputBase} style={getFieldStyle('user_email')}
-                    onFocus={() => setFocused(f => ({ ...f, user_email: true  }))}
-                    onBlur ={() => setFocused(f => ({ ...f, user_email: false }))} />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold mb-2 uppercase tracking-wider" style={{ color: 'var(--color-text-3)' }}>
-                    {text.messageLabel}
-                  </label>
-                  <textarea name="message" rows="5" required className={`${inputBase} resize-none`} style={getFieldStyle('message')}
-                    onFocus={() => setFocused(f => ({ ...f, message: true  }))}
-                    onBlur ={() => setFocused(f => ({ ...f, message: false }))} />
-                </div>
-
-                <motion.button
-                  type="submit"
-                  disabled={status === "loading"}
-                  whileHover={{ scale: 1.02, boxShadow: '0 0 32px rgba(124,58,237,0.5)' }}
-                  whileTap={{ scale: 0.97 }}
-                  className="w-full py-4 px-8 rounded-xl font-bold text-sm text-white transition-all duration-300 flex justify-center items-center gap-2 disabled:opacity-50"
-                  style={{ background: 'var(--accent-violet)', boxShadow: '0 0 0 0 rgba(124,58,237,0)' }}
-                >
-                  {status === "loading"
-                    ? <><FaSpinner className="animate-spin" /> {text.loadingText}</>
-                    : text.buttonText}
-                </motion.button>
-
-                {status === "success" && (
-                  <div className="flex items-center gap-2 text-emerald-400 bg-emerald-400/10 p-3 rounded-xl border border-emerald-400/20 justify-center text-sm font-semibold">
-                    <FaCheckCircle /> {text.successMsg}
-                  </div>
-                )}
-                {status === "error" && (
-                  <div className="flex items-center gap-2 text-red-400 bg-red-400/10 p-3 rounded-xl border border-red-400/20 justify-center text-sm font-semibold">
-                    <FaExclamationCircle /> {text.errorMsg}
-                  </div>
-                )}
-              </div>
-            </form>
-          </motion.div>
-        </motion.div>
+          </form>
+        </Reveal>
       </div>
     </section>
   );
-};
-
-export default Contact;
+}
